@@ -124,7 +124,7 @@ namespace Mija_Reader
 
             string browserContents = doc.Body.InnerText;
 
-            if(browserContents.Contains("Udało się! Mija Reader jest teraz połączona z Twoim kontem Dropbox."))
+            if(browserContents.Contains(SelectedLanguage.WebBrowserSucces))
             {
                 _client.GetAccessTokenAsync((accessToken) =>
                 {
@@ -150,6 +150,7 @@ namespace Mija_Reader
             SelectedLanguage.Reading = c.Reading;
             SelectedLanguage.Finished = c.Finished;
             SelectedLanguage.Abandoned = c.Abandoned;
+            SelectedLanguage.WebBrowserSucces = c.WebBrowserSucces;
         }
     }
 }

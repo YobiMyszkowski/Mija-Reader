@@ -16,7 +16,7 @@
                 <TabControl>
                     <TabItem Header="{Binding SelectedLanguage.Reading}"></TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Finished}"></TabItem>
-                    <TabItem Header="{Binding SelectedLanguage.Abbandoned}"></TabItem>
+                    <TabItem Header="{Binding SelectedLanguage.Abandoned}"></TabItem>
                 </TabControl>
             </TabItem>
             <TabItem Header="Chapters"></TabItem>
