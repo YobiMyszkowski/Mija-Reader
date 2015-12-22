@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mija Reader", "Mija Reader\Mija Reader.csproj", "{CC5F54A3-C13C-4DDD-AA8D-57D7647EE6C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolishLanguage", "PolishLanguage\PolishLanguage.csproj", "{A05336BD-3CCD-4438-BC47-B269407A5F1A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Languages", "Languages", "{6E717CF3-AA43-4EF5-9B42-9400C9BBC6A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnglishLanguage", "EnglishLanguage\EnglishLanguage.csproj", "{CA05E049-AD14-48E2-B8D8-7043299E9F91}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC5F54A3-C13C-4DDD-AA8D-57D7647EE6C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC5F54A3-C13C-4DDD-AA8D-57D7647EE6C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC5F54A3-C13C-4DDD-AA8D-57D7647EE6C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC5F54A3-C13C-4DDD-AA8D-57D7647EE6C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A05336BD-3CCD-4438-BC47-B269407A5F1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A05336BD-3CCD-4438-BC47-B269407A5F1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A05336BD-3CCD-4438-BC47-B269407A5F1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A05336BD-3CCD-4438-BC47-B269407A5F1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA05E049-AD14-48E2-B8D8-7043299E9F91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA05E049-AD14-48E2-B8D8-7043299E9F91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA05E049-AD14-48E2-B8D8-7043299E9F91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA05E049-AD14-48E2-B8D8-7043299E9F91}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A05336BD-3CCD-4438-BC47-B269407A5F1A} = {6E717CF3-AA43-4EF5-9B42-9400C9BBC6A9}
+		{CA05E049-AD14-48E2-B8D8-7043299E9F91} = {6E717CF3-AA43-4EF5-9B42-9400C9BBC6A9}
+	EndGlobalSection
+EndGlobal
