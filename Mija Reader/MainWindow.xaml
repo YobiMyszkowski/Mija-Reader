@@ -7,22 +7,22 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <TabControl>
-            <TabItem Header="LogIn">
+        <TabControl x:Name="c_MainTabTC">
+            <TabItem Header="{Binding SelectedLanguage.Login}">
                 <WebBrowser x:Name="loginBrowser"></WebBrowser>
             </TabItem>
-            <TabItem Header="Home"></TabItem>
-            <TabItem Header="Library">
+            <TabItem Header="{Binding SelectedLanguage.Home}"></TabItem>
+            <TabItem Header="{Binding SelectedLanguage.Library}">
                 <TabControl>
                     <TabItem Header="{Binding SelectedLanguage.Reading}"></TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Finished}"></TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Abandoned}"></TabItem>
                 </TabControl>
             </TabItem>
-            <TabItem Header="Chapters"></TabItem>
-            <TabItem Header="Reader"></TabItem>
-            <TabItem Header="Settings">
-                <GroupBox Header="Language" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <TabItem Header="{Binding SelectedLanguage.Chapters}"></TabItem>
+            <TabItem Header="{Binding SelectedLanguage.Reader}"></TabItem>
+            <TabItem Header="{Binding SelectedLanguage.Settings}">
+                <GroupBox Header="{Binding SelectedLanguage.LanguageString}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <ComboBox x:Name="c_LanguageCB" ItemsSource="{Binding Languages}"  SelectionChanged="c_LanguageCB_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>

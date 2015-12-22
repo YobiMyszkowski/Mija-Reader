@@ -48,7 +48,7 @@ namespace Mija_Reader
             if (System.IO.Directory.Exists(System.IO.Directory.GetCurrentDirectory().ToString() + @"\Data\Languages\") == true)
             {
                 string[] filePaths = System.IO.Directory.GetFiles(Environment.CurrentDirectory.ToString() + @"\Data\Languages\", "*Language.dll");
-                
+
                 if (filePaths.Count() == 0)
                 {
                     c_LanguageCB.IsEnabled = false;
@@ -97,22 +97,33 @@ namespace Mija_Reader
 
             if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
             {
+                (c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
+                for (int i = 1; i < c_MainTabTC.Items.Count; i++)
+                {
+                    (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
+                }
+                c_MainTabTC.SelectedIndex = 1;
+
                 try
                 {
-                    _client = new DropNetClient(_apiKey, _appsecret);//, MyIni.Read("accessToken", "DropBox"), MyIni.Read("accessSecret", "DropBox"));
+                    _client = new DropNetClient(_apiKey, _appsecret);
 
                     _client.UserLogin = new DropNet.Models.UserLogin { Token = MyIni.Read("accessToken", "DropBox"), Secret = MyIni.Read("accessSecret", "DropBox") };
-
-                    //var url = _client.AccountInfo();
-                    //MessageBox.Show(url.display_name);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new Exception(ex.Message);
                 }
             }
             else
             {
+                (c_MainTabTC.Items[0] as TabItem).IsEnabled = true;
+                for (int i = 1; i < c_MainTabTC.Items.Count; i++)
+                {
+                    (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
+                }
+                c_MainTabTC.SelectedIndex = 0;
+
                 try
                 {
                     _client = new DropNetClient(_apiKey, _appsecret);
@@ -139,7 +150,7 @@ namespace Mija_Reader
 
             string browserContents = doc.Body.InnerText;
 
-            if(browserContents.Contains(SelectedLanguage.WebBrowserSucces))
+            if (browserContents.Contains(SelectedLanguage.WebBrowserSucces))
             {
                 _client.GetAccessTokenAsync((accessToken) =>
                 {
@@ -148,6 +159,13 @@ namespace Mija_Reader
                         //Store this token for "remember me" function
                         MyIni.Write("accessToken", accessToken.Token, "DropBox");
                         MyIni.Write("accessSecret", accessToken.Secret, "DropBox");
+
+                        (c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
+                        for (int i = 1; i < c_MainTabTC.Items.Count; i++)
+                        {
+                            (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
+                        }
+                        c_MainTabTC.SelectedIndex = 1;
                     }
                 },
                 (error) =>
@@ -163,10 +181,17 @@ namespace Mija_Reader
             dynamic c = Languages.ElementAt((sender as ComboBox).SelectedIndex);
             SelectedLanguage.LanguageName = c.LanguageName;
             SelectedLanguage.AuthorName = c.AuthorName;
+            SelectedLanguage.LanguageString = c.LanguageString;
             SelectedLanguage.Reading = c.Reading;
             SelectedLanguage.Finished = c.Finished;
             SelectedLanguage.Abandoned = c.Abandoned;
             SelectedLanguage.WebBrowserSucces = c.WebBrowserSucces;
+            SelectedLanguage.Login = c.Login;
+            SelectedLanguage.Home = c.Home;
+            SelectedLanguage.Library = c.Library;
+            SelectedLanguage.Chapters = c.Chapters;
+            SelectedLanguage.Reader = c.Reader;
+            SelectedLanguage.Settings = c.Settings;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }

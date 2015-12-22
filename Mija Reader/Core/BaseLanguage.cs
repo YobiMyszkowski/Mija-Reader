@@ -6,15 +6,21 @@ using System.ComponentModel; //INotifyPropertyChanged
 
 namespace Mija_Reader.Core
 {
-    public class BaseLanguage: INotifyPropertyChanged
+    public class BaseLanguage : INotifyPropertyChanged
     {
-        private string _LanguageName = "";
+        private string _LanguageName = "English";
         public string LanguageName
         {
             get { return _LanguageName; }
             set { _LanguageName = value; RaisePropertyChanged("LanguageName"); }
         }
-        private string _AuthorName = "";
+        private string _LanguageString = "Language";
+        public string LanguageString
+        {
+            get { return _LanguageString; }
+            set { _LanguageString = value; RaisePropertyChanged("LanguageString"); }
+        }
+        private string _AuthorName = "Michał Jachura";
         public string AuthorName
         {
             get { return _AuthorName; }
@@ -44,6 +50,43 @@ namespace Mija_Reader.Core
             get { return _WebBrowserSucces; }
             set { _WebBrowserSucces = value; RaisePropertyChanged("WebBrowserSucces"); }
         }
+        private string _Login = "Login";
+        public string Login
+        {
+            get { return _Login; }
+            set { _Login = value; RaisePropertyChanged("Login"); }
+        }
+        private string _Home = "Home";
+        public string Home
+        {
+            get { return _Home; }
+            set { _Home = value; RaisePropertyChanged("Home"); }
+        }
+        private string _Library = "Library";
+        public string Library
+        {
+            get { return _Library; }
+            set { _Library = value; RaisePropertyChanged("Library"); }
+        }
+        private string _Chapters = "Chapters";
+        public string Chapters
+        {
+            get { return _Chapters; }
+            set { _Chapters = value; RaisePropertyChanged("Chapters"); }
+        }
+        private string _Reader = "Reader";
+        public string Reader
+        {
+            get { return _Reader; }
+            set { _Reader = value; RaisePropertyChanged("Reader"); }
+        }
+        private string _Settings = "Settings";
+        public string Settings
+        {
+            get { return _Settings; }
+            set { _Settings = value; RaisePropertyChanged("Settings"); }
+        }
+
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
