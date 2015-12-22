@@ -94,22 +94,41 @@ namespace Mija_Reader
             #endregion
 
             #region InitializeDropBox
-            _client = new DropNetClient(_apiKey, _appsecret);
-            // Sync
-            _client.GetToken();
-            // Async
-            _client.GetTokenAsync((userLogin) =>
-            {
-                //Dont really need to do anything with userLogin, DropNet takes care of it for now
-            },
-            (error) =>
-            {
-                //Handle error
-            });
-            var url = _client.BuildAuthorizeUrl();
 
-            loginBrowser.Navigate(url);
-            loginBrowser.LoadCompleted += Browser_LoadCompleted;
+            if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
+            {
+                try
+                {
+                    _client = new DropNetClient(_apiKey, _appsecret);//, MyIni.Read("accessToken", "DropBox"), MyIni.Read("accessSecret", "DropBox"));
+
+                    _client.UserLogin = new DropNet.Models.UserLogin { Token = MyIni.Read("accessToken", "DropBox"), Secret = MyIni.Read("accessSecret", "DropBox") };
+
+                    //var url = _client.AccountInfo();
+                    //MessageBox.Show(url.display_name);
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
+            else
+            {
+                try
+                {
+                    _client = new DropNetClient(_apiKey, _appsecret);
+                    // Sync
+                    _client.GetToken();
+
+                    var url = _client.BuildAuthorizeUrl();
+
+                    loginBrowser.Navigate(url);
+                    loginBrowser.LoadCompleted += Browser_LoadCompleted;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
             #endregion
         }
 
@@ -124,10 +143,11 @@ namespace Mija_Reader
             {
                 _client.GetAccessTokenAsync((accessToken) =>
                 {
-                    //Store this token for "remember me" function
                     if (accessToken != null)
                     {
                         //Store this token for "remember me" function
+                        MyIni.Write("accessToken", accessToken.Token, "DropBox");
+                        MyIni.Write("accessSecret", accessToken.Secret, "DropBox");
                     }
                 },
                 (error) =>
