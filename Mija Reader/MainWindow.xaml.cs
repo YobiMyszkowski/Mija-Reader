@@ -17,6 +17,7 @@ namespace Mija_Reader
         private const string _apiKey = "1d17vae78l691bl";
         private const string _appsecret = "8gn5q15w1fy3gpm";
         DropNetClient _client = null;
+        Core.Ini MyIni = null;
 
         private ObservableCollection<dynamic> _Languages = new ObservableCollection<dynamic>();
         public ObservableCollection<dynamic> Languages
@@ -40,6 +41,9 @@ namespace Mija_Reader
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
+            #region ini settings
+            MyIni = new Core.Ini("Settings.ini");
+            #endregion
             #region load_Languages
             if (System.IO.Directory.Exists(System.IO.Directory.GetCurrentDirectory().ToString() + @"\Data\Languages\") == true)
             {
@@ -61,35 +65,27 @@ namespace Mija_Reader
                             {
                                 dynamic c = Activator.CreateInstance(type);
                                 Languages.Add(c);
+
+                                if (MyIni.KeyExists("Language", "WindowData"))
+                                {
+                                    if (MyIni.Read("Language", "WindowData") == c.LanguageName)
+                                    {
+                                        c_LanguageCB.SelectedIndex = i;
+                                    }
+                                }
+                                else
+                                {
+                                    c_LanguageCB.SelectedIndex = 0; // select english language after first run
+                                }
                             }
                         }
                         catch (Exception ex)
                         {
                             throw new Exception(ex.Message);
                         }
-
-                        // TODO: Load saved language from conig .ini or .xml and select it
-
                         c_LanguageCB.IsEnabled = true;
-                        c_LanguageCB.SelectedIndex = 0;
-
-                        //var domain = AppDomain.CreateDomain("LanguagesDomain");
-                        //var pathToDll = @"C:\myDll.dll";
-                        //string type = "Language.Lang";
-                        //var tempLang = domain.CreateInstanceFromAndUnwrap(filePaths[i], type) as Core.BaseLanguage;
-                        //if (tempLang == null) throw new Exception("broke");
-                        //runnable.Run();
-                        // c_LanguageCB.Items.Add(list[i]);
-                        ////if (MyIni.KeyExists("Language", "WindowData"))
-                        //{
-                        //    if (MyIni.Read("Language", "WindowData") == list[i])
-                        //   {
-                        //       c_LanguageCB.SelectedIndex = i;
-                        //   }
-                        // }
                     }
                 }
-
             }
             else
             {
@@ -151,6 +147,8 @@ namespace Mija_Reader
             SelectedLanguage.Finished = c.Finished;
             SelectedLanguage.Abandoned = c.Abandoned;
             SelectedLanguage.WebBrowserSucces = c.WebBrowserSucces;
+
+            MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
     }
 }
