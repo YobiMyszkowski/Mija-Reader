@@ -18,5 +18,9 @@
         public string Chapters { get { return "Chapters"; } }
         public string Reader { get { return "Reader"; } }
         public string Settings { get { return "Settings"; } }
+
+        public string LastRead { get { return "Last read:"; } }
+        public string NewChapters { get { return "Last updated:"; } }
+        public string Search { get { return "Search:"; } }
     }
 }

@@ -192,6 +192,9 @@ namespace Mija_Reader
             SelectedLanguage.Chapters = c.Chapters;
             SelectedLanguage.Reader = c.Reader;
             SelectedLanguage.Settings = c.Settings;
+            SelectedLanguage.LastRead = c.LastRead;
+            SelectedLanguage.NewChapters = c.NewChapters;
+            SelectedLanguage.Search = c.Search;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }

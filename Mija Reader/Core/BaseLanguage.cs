@@ -86,7 +86,24 @@ namespace Mija_Reader.Core
             get { return _Settings; }
             set { _Settings = value; RaisePropertyChanged("Settings"); }
         }
-
+        private string _LastRead = "Last read:";
+        public string LastRead
+        {
+            get { return _LastRead; }
+            set { _LastRead = value; RaisePropertyChanged("LastRead"); }
+        }
+        private string _NewChapters = "New chapters:";
+        public string NewChapters
+        {
+            get { return _NewChapters; }
+            set { _NewChapters = value; RaisePropertyChanged("NewChapters"); }
+        }
+        private string _Search = "Search:";
+        public string Search
+        {
+            get { return _Search; }
+            set { _Search = value; RaisePropertyChanged("Search"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

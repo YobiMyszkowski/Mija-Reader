@@ -11,7 +11,23 @@
             <TabItem Header="{Binding SelectedLanguage.Login}">
                 <WebBrowser x:Name="loginBrowser"></WebBrowser>
             </TabItem>
-            <TabItem Header="{Binding SelectedLanguage.Home}"></TabItem>
+            <TabItem Header="{Binding SelectedLanguage.Home}">
+                <StackPanel Orientation="Horizontal">
+                    <GroupBox Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
+                        <ListView></ListView>
+                    </GroupBox>
+                    <GroupBox Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
+                        <ListView></ListView>
+                    </GroupBox>
+                    <GroupBox Header="{Binding SelectedLanguage.Search}" MinWidth="200">
+                        <StackPanel>
+                            <ComboBox MaxHeight="20"></ComboBox>
+                            <TextBox MaxHeight="25"></TextBox>
+                            <ListView></ListView>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Library}">
                 <TabControl>
                     <TabItem Header="{Binding SelectedLanguage.Reading}"></TabItem>
