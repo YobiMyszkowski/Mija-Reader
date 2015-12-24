@@ -8,9 +8,11 @@ using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.Windows.Navigation;
 using System.Windows.Media.Imaging;
+using System.Threading.Tasks;
 using DropNet;
 using System.Collections.Generic;
 using Mija_Reader.AdditionalControls;
+
 
 namespace System.Windows.Controls
 {
@@ -272,6 +274,25 @@ namespace Mija_Reader
             }
             #endregion
 
+            #region load_Chapters display direction
+            if(MyIni.KeyExists("ChapterDisplayDirection", "WindowData") == true)
+            {
+                if (MyIni.Read("ChapterDisplayDirection", "WindowData") == "Start")
+                {
+                    c_ChapterDirectionCB.SelectedIndex = 0;
+                }
+                else
+                {
+                    c_ChapterDirectionCB.SelectedIndex = 1;
+                }
+            }
+            else
+            {
+                MyIni.Write("ChapterDisplayDirection", "Start", "WindowData");
+                c_ChapterDirectionCB.SelectedIndex = 0;
+            }
+            #endregion
+
             #region InitializeDropBox
             if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
             {
@@ -425,6 +446,12 @@ namespace Mija_Reader
             SelectedLanguage.Top = c.Top;
             SelectedLanguage.End = c.End;
             SelectedLanguage.RemoveFromLibrary = c.RemoveFromLibrary;
+            SelectedLanguage.ViewOnline = c.ViewOnline;
+            SelectedLanguage.MarkAsRead = c.MarkAsRead;
+            SelectedLanguage.MarkAllPreviousAsRead = c.MarkAllPreviousAsRead;
+            SelectedLanguage.ChaptersDirection = c.ChaptersDirection;
+            SelectedLanguage.FromStartToEnd = c.FromStartToEnd;
+            SelectedLanguage.FromEndToStart = c.FromEndToStart;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
@@ -903,10 +930,6 @@ namespace Mija_Reader
                 data.RemoveAt(selectedListView.FirstOrDefault().SelectedIndex);              
             }
         }
-        private void MenuItem_Click_ShowChaptersLibrary(object sender, RoutedEventArgs e)
-        {
-
-        }
         private void tvLibrary_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
@@ -956,6 +979,372 @@ namespace Mija_Reader
                     }
                 }
             }
+        }
+        private async void MenuItem_Click_ShowChaptersLibrary(object sender, RoutedEventArgs e)
+        {
+            ChaptersInfo.Clear();
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                BaseMangaSource.MangaPageData panel = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+                if (panel != null)
+                {
+                    if (SearchPluginData.ElementAt(c_SearchCB.SelectedIndex).Website == panel.UrlToMainpage)
+                    {
+                        // dont do anything we got good parser
+                    }
+                    else
+                    {
+                        // pick up good parser
+                        for (int i = 0; i < SearchPluginData.Count; i++)
+                        {
+                            c_SearchCB.SelectedIndex = i;
+                            if (SearchPluginData.ElementAt(c_SearchCB.SelectedIndex).Website == panel.UrlToMainpage)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    bool reult = await parser.ParseSelectedPageAsync(panel.Website, true, null, ChaptersInfo);
+                    if (reult == true)
+                    {
+                        if (MyIni.KeyExists("ChapterDisplayDirection", "WindowData") == true)
+                        {
+                            if (MyIni.Read("ChapterDisplayDirection", "WindowData") == "Start")
+                            {
+                                for (int i = 0; i < ChaptersInfo.Count; i++)
+                                {
+                                    if (library.IsChapterMarkedAsReadInManga(panel.Name, panel.Website, ChaptersInfo.ElementAt(i).Name, ChaptersInfo.ElementAt(i).UrlToPage))
+                                    {
+                                        ChaptersInfo.ElementAt(i).Foreground = Brushes.Gray;
+                                    }
+                                    else
+                                    {
+                                        ChaptersInfo.ElementAt(i).Foreground = Brushes.Black;
+                                    }
+                                }
+                                c_MainTabTC.SelectedIndex = 3;
+                            }
+                            else //end
+                            {
+                                for (int i = 0; i < ChaptersInfo.Count; i++)
+                                {
+                                    ChaptersInfo.Move(ChaptersInfo.Count - 1, i); //reverse list
+
+                                    if (library.IsChapterMarkedAsReadInManga(panel.Name, panel.Website, ChaptersInfo.ElementAt(i).Name, ChaptersInfo.ElementAt(i).UrlToPage))
+                                    {
+                                        ChaptersInfo.ElementAt(i).Foreground = Brushes.Gray;
+                                    }
+                                    else
+                                    {
+                                        ChaptersInfo.ElementAt(i).Foreground = Brushes.Black;
+                                    }
+                                }
+                                c_MainTabTC.SelectedIndex = 3;
+                            }
+                            // check for new chapters
+                            int getSavedChapters = library.GetChaptersAmount(panel.Name, panel.Website);
+                            int getUnreadChapters = panel.UnreadChapters;
+                            if ((getSavedChapters + getUnreadChapters) < ChaptersInfo.Count)
+                            {
+                                // we got new chapters
+                                int newChapters = ChaptersInfo.Count - (getSavedChapters + getUnreadChapters);
+                                library.ChangeUnreadChapters(panel.Name, panel.Website, string.Format("{0}", newChapters + getUnreadChapters));
+                                library.Save();
+                                panel.UnreadChapters = newChapters + getUnreadChapters;
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        private void MenuItem_Click_ViewOnline(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void MenuItem_Click_MarkAsRead(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                BaseMangaSource.MangaPageData panel = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+                if (panel != null)
+                {
+                    BaseMangaSource.MangaPageChapters selectedChapter = null;
+                    if (tvChaptersList.SelectedItem != null)
+                        selectedChapter = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
+
+                    if (selectedChapter != null)
+                    {
+                        if (IsEqual(selectedChapter.Foreground, Brushes.Gray))
+                        {
+                            // it's already marked as read, no need to do anything
+                        }
+                        else
+                        {
+                            selectedChapter.Foreground = Brushes.Gray;
+                            // mark chapter and decrease unread ammount
+                            if (library.IsChapterExistInManga(panel.Name, panel.Website, selectedChapter.Name, selectedChapter.UrlToPage))
+                            {
+                                library.MarkChapter(panel.Name, panel.Website, selectedChapter.Name, selectedChapter.UrlToPage, true);
+
+                                int getUnreadChapters = panel.UnreadChapters;
+                                if (getUnreadChapters > 0)
+                                {
+                                    library.ChangeUnreadChapters(panel.Name, panel.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                    panel.UnreadChapters = getUnreadChapters - 1;
+                                }
+                            }
+                            else
+                            {
+                                library.AddChapterToManga(panel.Name, panel.Website, selectedChapter.Name, selectedChapter.UrlToPage, true);
+
+                                int getUnreadChapters = panel.UnreadChapters;
+                                if (getUnreadChapters > 0)
+                                {
+                                    library.ChangeUnreadChapters(panel.Name, panel.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                    panel.UnreadChapters = getUnreadChapters - 1;
+                                }
+                            }
+                            library.Save();
+                        }
+                    }
+                }
+            }
+        }
+        private void MenuItem_Click_MarkAllPreviousAsRead(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                BaseMangaSource.MangaPageData panel = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+                if (panel != null)
+                {
+                    BaseMangaSource.MangaPageChapters selectedChapter = null;
+                    if (tvChaptersList.SelectedItem != null)
+                        selectedChapter = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
+
+                    if (selectedChapter != null)
+                    {
+                        if (MyIni.KeyExists("ChapterDisplayDirection", "WindowData") == true)
+                        {
+                            new Task(() =>
+                            {
+                                if (MyIni.Read("ChapterDisplayDirection", "WindowData") == "Start")
+                                {
+                                    for (int i = 0; i < tvChaptersList.Items.Count; i++)
+                                    {
+                                        BaseMangaSource.MangaPageChapters itemToCompare = ChaptersInfo.ElementAt(i);
+                                        if (selectedChapter.Name == itemToCompare.Name && selectedChapter.UrlToPage == itemToCompare.UrlToPage)
+                                        {
+                                            library.Save();
+                                            return;
+                                        }
+                                        else
+                                        {
+                                            if (IsEqual(itemToCompare.Foreground, Brushes.Gray))
+                                            {
+                                                //dont do anything, since its already marked :p
+                                            }
+                                            else
+                                            {
+                                                itemToCompare.Foreground = Brushes.Gray;
+
+                                                if (library.IsChapterExistInManga(panel.Name, panel.Website, itemToCompare.Name, itemToCompare.UrlToPage))
+                                                {
+                                                    library.MarkChapter(panel.Name, panel.Website, itemToCompare.Name, itemToCompare.UrlToPage, true);
+                                                    int getUnreadChapters = panel.UnreadChapters;
+                                                    if (getUnreadChapters > 0)
+                                                    {
+                                                        library.ChangeUnreadChapters(panel.Name, panel.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                                        panel.UnreadChapters = getUnreadChapters - 1;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    library.AddChapterToManga(panel.Name, panel.Website, itemToCompare.Name, itemToCompare.UrlToPage, true);
+                                                    int getUnreadChapters = panel.UnreadChapters;
+                                                    if (getUnreadChapters > 0)
+                                                    {
+                                                        library.ChangeUnreadChapters(panel.Name, panel.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                                        panel.UnreadChapters = getUnreadChapters - 1;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    library.Save();
+                                }
+                                else //"End"
+                                {
+                                    for (int i = tvChaptersList.Items.Count - 1; i > 0; i--)
+                                    {
+                                        BaseMangaSource.MangaPageChapters itemToCompare = ChaptersInfo.ElementAt(i);
+                                        if (selectedChapter.Name == itemToCompare.Name && selectedChapter.UrlToPage == itemToCompare.UrlToPage)
+                                        {
+                                            library.Save();
+                                            return;
+                                        }
+                                        else
+                                        {
+                                            if (IsEqual(itemToCompare.Foreground, Brushes.Gray))
+                                            {
+                                                //dont do anything, since its already marked :p
+                                            }
+                                            else
+                                            {
+                                                itemToCompare.Foreground = Brushes.Gray;
+
+                                                if (library.IsChapterExistInManga(panel.Name, panel.Website, itemToCompare.Name, itemToCompare.UrlToPage))
+                                                {
+                                                    library.MarkChapter(panel.Name, panel.Website, itemToCompare.Name, itemToCompare.UrlToPage, true);
+                                                    int getUnreadChapters = panel.UnreadChapters;
+                                                    if (getUnreadChapters > 0)
+                                                    {
+                                                        library.ChangeUnreadChapters(panel.Name, panel.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                                        panel.UnreadChapters = getUnreadChapters - 1;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    library.AddChapterToManga(panel.Name, panel.Website, itemToCompare.Name, itemToCompare.UrlToPage, true);
+                                                    int getUnreadChapters = panel.UnreadChapters;
+                                                    if (getUnreadChapters > 0)
+                                                    {
+                                                        library.ChangeUnreadChapters(panel.Name, panel.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                                        panel.UnreadChapters = getUnreadChapters - 1;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    library.Save();
+
+                                }
+                            }).Start();
+                        }
+                    }
+                }
+            }
+        }
+        private void c_ChapterDirectionCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if ((c_ChapterDirectionCB.SelectedItem as ComboBoxItem).Content as string == SelectedLanguage.FromStartToEnd)
+            {
+                if (ChaptersInfo.Count > 0)
+                {
+                    for (int i = 0; i < ChaptersInfo.Count; i++)
+                    {
+                        ChaptersInfo.Move(ChaptersInfo.Count - 1, i); //reverse list
+                    }
+                }
+                MyIni.Write("ChapterDisplayDirection", "Start", "WindowData");
+            }
+            else // End to Start
+            {
+                if (ChaptersInfo.Count > 0)
+                {
+                    for (int i = 0; i < ChaptersInfo.Count; i++)
+                    {
+                        ChaptersInfo.Move(ChaptersInfo.Count - 1, i); //reverse list
+                    }
+                }
+                MyIni.Write("ChapterDisplayDirection", "End", "WindowData");
+            }
+        }
+        public static bool IsEqual(Brush aBrush1, Brush aBrush2)
+        {
+            if (aBrush1.GetType() != aBrush2.GetType())
+                return false;
+            else
+            {
+                if (aBrush1 is SolidColorBrush)
+                {
+                    return (aBrush1 as SolidColorBrush).Color ==
+                      (aBrush2 as SolidColorBrush).Color &&
+                      (aBrush1 as SolidColorBrush).Opacity == (aBrush2 as SolidColorBrush).Opacity;
+                }
+                else if (aBrush1 is LinearGradientBrush)
+                {
+                    bool result = true;
+                    result = (aBrush1 as LinearGradientBrush).ColorInterpolationMode ==
+                      (aBrush2 as LinearGradientBrush).ColorInterpolationMode && result;
+                    result = (aBrush1 as LinearGradientBrush).EndPoint ==
+                      (aBrush2 as LinearGradientBrush).EndPoint && result;
+                    result = (aBrush1 as LinearGradientBrush).MappingMode ==
+                      (aBrush2 as LinearGradientBrush).MappingMode && result;
+                    result = (aBrush1 as LinearGradientBrush).Opacity ==
+                      (aBrush2 as LinearGradientBrush).Opacity && result;
+                    result = (aBrush1 as LinearGradientBrush).StartPoint ==
+                      (aBrush2 as LinearGradientBrush).StartPoint && result;
+                    result = (aBrush1 as LinearGradientBrush).SpreadMethod ==
+                      (aBrush2 as LinearGradientBrush).SpreadMethod && result;
+                    result = (aBrush1 as LinearGradientBrush).GradientStops.Count ==
+                      (aBrush2 as LinearGradientBrush).GradientStops.Count && result;
+                    if (result && (aBrush1 as LinearGradientBrush).GradientStops.Count ==
+                              (aBrush2 as LinearGradientBrush).GradientStops.Count)
+                    {
+                        for (int i = 0; i < (aBrush1 as LinearGradientBrush).GradientStops.Count; i++)
+                        {
+                            result = (aBrush1 as LinearGradientBrush).GradientStops[i].Color ==
+                              (aBrush2 as LinearGradientBrush).GradientStops[i].Color && result;
+                            result = (aBrush1 as LinearGradientBrush).GradientStops[i].Offset ==
+                              (aBrush2 as LinearGradientBrush).GradientStops[i].Offset && result;
+                            if (!result)
+                                return result;
+                        }
+                    }
+                    return result;
+                }
+                else if (aBrush1 is RadialGradientBrush)
+                {
+                    bool result = true;
+                    result = (aBrush1 as RadialGradientBrush).ColorInterpolationMode ==
+                                 (aBrush2 as RadialGradientBrush).ColorInterpolationMode && result;
+                    result = (aBrush1 as RadialGradientBrush).GradientOrigin ==
+                                (aBrush2 as RadialGradientBrush).GradientOrigin && result;
+                    result = (aBrush1 as RadialGradientBrush).MappingMode == (aBrush2 as RadialGradientBrush).MappingMode && result;
+                    result = (aBrush1 as RadialGradientBrush).Opacity == (aBrush2 as RadialGradientBrush).Opacity && result;
+                    result = (aBrush1 as RadialGradientBrush).RadiusX == (aBrush2 as RadialGradientBrush).RadiusX && result;
+                    result = (aBrush1 as RadialGradientBrush).RadiusY == (aBrush2 as RadialGradientBrush).RadiusY && result;
+                    result = (aBrush1 as RadialGradientBrush).SpreadMethod == (aBrush2 as RadialGradientBrush).SpreadMethod && result;
+                    result = (aBrush1 as RadialGradientBrush).GradientStops.Count == (aBrush2 as RadialGradientBrush).GradientStops.Count && result;
+                    if (result && (aBrush1 as RadialGradientBrush).GradientStops.Count == (aBrush2 as RadialGradientBrush).GradientStops.Count)
+                    {
+                        for (int i = 0; i < (aBrush1 as RadialGradientBrush).GradientStops.Count; i++)
+                        {
+                            result = (aBrush1 as RadialGradientBrush).GradientStops[i].Color ==
+                                          (aBrush2 as RadialGradientBrush).GradientStops[i].Color && result;
+                            result = (aBrush1 as RadialGradientBrush).GradientStops[i].Offset ==
+                                              (aBrush2 as RadialGradientBrush).GradientStops[i].Offset && result;
+                            if (!result)
+                                return result;
+                        }
+                    }
+                    return result;
+                }
+                else if (aBrush1 is ImageBrush)
+                {
+                    bool result = true;
+                    result = (aBrush1 as ImageBrush).AlignmentX == (aBrush2 as ImageBrush).AlignmentX && result;
+                    result = (aBrush1 as ImageBrush).AlignmentY == (aBrush2 as ImageBrush).AlignmentY && result;
+                    result = (aBrush1 as ImageBrush).Opacity == (aBrush2 as ImageBrush).Opacity && result;
+                    result = (aBrush1 as ImageBrush).Stretch == (aBrush2 as ImageBrush).Stretch && result;
+                    result = (aBrush1 as ImageBrush).TileMode == (aBrush2 as ImageBrush).TileMode && result;
+                    result = (aBrush1 as ImageBrush).Viewbox == (aBrush2 as ImageBrush).Viewbox && result;
+                    result = (aBrush1 as ImageBrush).ViewboxUnits == (aBrush2 as ImageBrush).ViewboxUnits && result;
+                    result = (aBrush1 as ImageBrush).Viewport == (aBrush2 as ImageBrush).Viewport && result;
+                    result = (aBrush1 as ImageBrush).ViewportUnits == (aBrush2 as ImageBrush).ViewportUnits && result;
+
+                    result = (aBrush1 as ImageBrush).ImageSource == (aBrush2 as ImageBrush).ImageSource && result;
+                    return result;
+                }
+            }
+            return false;
         }
     }
 }

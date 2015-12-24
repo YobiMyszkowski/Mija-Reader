@@ -212,7 +212,42 @@ namespace Mija_Reader.Core
             get { return _RemoveFromLibrary; }
             set { _RemoveFromLibrary = value; RaisePropertyChanged("RemoveFromLibrary"); }
         }
-
+        private string _ViewOnline = "View online";
+        public string ViewOnline
+        {
+            get { return _ViewOnline; }
+            set { _ViewOnline = value; RaisePropertyChanged("ViewOnline"); }
+        }
+        private string _MarkAsRead = "Mark as read";
+        public string MarkAsRead
+        {
+            get { return _MarkAsRead; }
+            set { _MarkAsRead = value; RaisePropertyChanged("MarkAsRead"); }
+        }
+        private string _MarkAllPreviousAsRead = "Mark all previous as read";
+        public string MarkAllPreviousAsRead
+        {
+            get { return _MarkAllPreviousAsRead; }
+            set { _MarkAllPreviousAsRead = value; RaisePropertyChanged("MarkAllPreviousAsRead"); }
+        }
+        private string _ChaptersDirection = "Displaying direction";
+        public string ChaptersDirection
+        {
+            get { return _ChaptersDirection; }
+            set { _ChaptersDirection = value; RaisePropertyChanged("ChaptersDirection"); }
+        }
+        private string _FromStartToEnd = "From beginning to end";
+        public string FromStartToEnd
+        {
+            get { return _FromStartToEnd; }
+            set { _FromStartToEnd = value; RaisePropertyChanged("FromStartToEnd"); }
+        }
+        private string _FromEndToStart = "From end to beginning";
+        public string FromEndToStart
+        {
+            get { return _FromEndToStart; }
+            set { _FromEndToStart = value; RaisePropertyChanged("FromEndToStart"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

@@ -42,5 +42,11 @@
         public string Top { get { return "beginning"; } }
         public string End { get { return "end"; } }
         public string RemoveFromLibrary { get { return "Remove from library"; } }
+        public string ViewOnline { get { return "View online"; } }
+        public string MarkAsRead { get { return "Mark as read"; } }
+        public string MarkAllPreviousAsRead { get { return "Mark all previous as read"; } }
+        public string ChaptersDirection { get { return "Chapters direction"; } }
+        public string FromStartToEnd { get { return "From beginning to end"; } }
+        public string FromEndToStart { get { return "From end to beginning"; } }
     }
 }

@@ -261,10 +261,48 @@
                     </TabItem>
                 </TabControl>
             </TabItem>
-            <TabItem Header="{Binding SelectedLanguage.Chapters}"></TabItem>
+            <TabItem Header="{Binding SelectedLanguage.Chapters}">
+                <ListView x:Name="tvChaptersList" Background="Transparent" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" ItemsSource="{Binding ChaptersInfo}">
+                    <ListView.Resources>
+                        <ContextMenu x:Key="MainCM">
+                            <MenuItem Header="{Binding SelectedLanguage.ViewOnline}" Click="MenuItem_Click_ViewOnline"/>
+                            <Separator></Separator>
+                            <MenuItem Header="{Binding SelectedLanguage.MarkAsRead}" Click="MenuItem_Click_MarkAsRead"/>
+                            <MenuItem Header="{Binding SelectedLanguage.MarkAllPreviousAsRead}" Click="MenuItem_Click_MarkAllPreviousAsRead"/>
+                        </ContextMenu>
+                    </ListView.Resources>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ToolTip="{Binding UrlToPage}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <!-- fill grid background-->
+                                <TextBlock Text="{Binding Name}" Foreground="{Binding Foreground}" Grid.Row="0" Grid.Column="0"/>
+
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Reader}"></TabItem>
             <TabItem Header="{Binding SelectedLanguage.Settings}">
-                <GroupBox Header="{Binding SelectedLanguage.LanguageString}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"></RowDefinition>
+                        <RowDefinition Height="50"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                <GroupBox Grid.Column="0" Grid.Row="0" Header="{Binding SelectedLanguage.LanguageString}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <ComboBox x:Name="c_LanguageCB" ItemsSource="{Binding Languages}"  SelectionChanged="c_LanguageCB_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -272,7 +310,14 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                </GroupBox>
+                    </GroupBox>
+                    <GroupBox Grid.Column="0" Grid.Row="1" Header="{Binding SelectedLanguage.ChaptersDirection}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <ComboBox x:Name="c_ChapterDirectionCB" SelectionChanged="c_ChapterDirectionCB_SelectionChanged">
+                            <ComboBoxItem Content="{Binding SelectedLanguage.FromStartToEnd}"></ComboBoxItem>
+                            <ComboBoxItem Content="{Binding SelectedLanguage.FromEndToStart}"></ComboBoxItem>
+                        </ComboBox>
+                    </GroupBox>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

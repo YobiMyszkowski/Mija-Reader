@@ -350,7 +350,7 @@ namespace MangaParser
                             Name = ChapterName,
                             RealName = RealChapterName,
                             UrlToPage = UrlToPage,
-                            Foreground = Brushes.White
+                            Foreground = Brushes.Black
                         });
                     }
 
