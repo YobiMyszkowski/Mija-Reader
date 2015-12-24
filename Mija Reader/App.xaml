@@ -6,6 +6,9 @@
     <Application.Resources>
         <core:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <core:ToLowerValueConverter x:Key="ToLowerValueConverter"/>
+        <core:StringToImageSourceValueConverter x:Key="StringToImageSourceValueConverter"/>
+        <core:MangaStatusToStringValueConverter x:Key="MangaStatusToStringValueConverter"/>
+        <core:MangaTypeToStringValueConverter x:Key="MangaTypeToStringValueConverter"/>
         <!--  Button style -->
         <Style TargetType="{x:Type Button}" x:Key="WindowButtonStyle">
             <Setter Property="Template">

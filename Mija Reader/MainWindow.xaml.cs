@@ -44,6 +44,24 @@ namespace Mija_Reader
         Core.Ini MyIni = null;
         BaseMangaSource.IPlugin parser;
         MetroMessageBox mbox = new MetroMessageBox();
+        private ObservableCollection<BaseMangaSource.MangaPageData> _ReadingData = new ObservableCollection<BaseMangaSource.MangaPageData>();
+        public ObservableCollection<BaseMangaSource.MangaPageData> ReadingData
+        {
+            get { return _ReadingData; }
+            set { _ReadingData = value; }
+        }
+        private ObservableCollection<BaseMangaSource.MangaPageData> _FinishedData = new ObservableCollection<BaseMangaSource.MangaPageData>();
+        public ObservableCollection<BaseMangaSource.MangaPageData> FinishedData
+        {
+            get { return _FinishedData; }
+            set { _FinishedData = value; }
+        }
+        private ObservableCollection<BaseMangaSource.MangaPageData> _AbandonedData = new ObservableCollection<BaseMangaSource.MangaPageData>();
+        public ObservableCollection<BaseMangaSource.MangaPageData> AbandonedData
+        {
+            get { return _AbandonedData; }
+            set { _AbandonedData = value; }
+        }
         private ObservableCollection<dynamic> _Languages = new ObservableCollection<dynamic>();
         public ObservableCollection<dynamic> Languages
         {
@@ -579,14 +597,14 @@ namespace Mija_Reader
                 }
             }
         }
-
+        MangaDetailsViewer details;
         private async void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if((sender as ListView).Items.Count > 0)
             {
                 if ((sender as ListView).SelectedItem != null)
                 {
-                    MangaDetailsViewer details = new MangaDetailsViewer();
+                    details = new MangaDetailsViewer();
                     details.Owner = this;
                     details.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
@@ -638,9 +656,51 @@ namespace Mija_Reader
                         }
                         else
                         {
+                            return;
                         }
                     }
+                    details.tvAddToLibrary.Click += TvAddToLibrary_Click;
                     details.ShowDialog();
+                }
+            }
+        }
+        private async void TvAddToLibrary_Click(object sender, RoutedEventArgs e)
+        {
+            bool foundMatch = false;
+            string foundIn = "";
+            foreach (TabItem libraryChild in c_LibraryTabTC.Items)
+            {
+                ObservableCollection<BaseMangaSource.MangaPageData> data = ((libraryChild.Content as ListView).ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+                for(int i = 0; i < data.Count; i++)
+                {
+                    if(data.ElementAt(i).Name == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name)
+                    {
+                        foundMatch = true;
+                        foundIn = libraryChild.Header.ToString();
+                        break;
+                    }
+                }
+            }
+            if (foundMatch == true)
+            {
+                MetroMessageBox mbox = new MetroMessageBox();
+                mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                mbox.ShowMessage(this, string.Format("Manga '" + SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name + "' is already exist in your library. You can Find it in '" + foundIn + "'.", "Error"), "Information", MessageBoxMessage.information, MessageBoxButton.OK);
+            }
+            else
+            {
+                DetailedInfo.Clear();
+                bool x = await parser.ParseSelectedPageAsync(SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website, false, DetailedInfo, null);
+
+                if (ChaptersInfo != null)
+                {
+                    ReadingData.Add(DetailedInfo.FirstOrDefault());
+                    details.Close();
+                    c_MainTabTC.SelectedIndex = 2;
+                    c_LibraryTabTC.SelectedIndex = 0;
+
+                    //library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
+
                 }
             }
         }

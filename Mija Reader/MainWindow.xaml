@@ -53,7 +53,7 @@
                                 </ComboBox>
                                 <AdditionalControls:SearchTextBox x:Name="tvSearchText" Watermark="searching quote" KeyUp="SearchTextBox_KeyUp"/>
                             </StackPanel>
-                            <ListView Grid.Row="1" VerticalAlignment="Stretch" ItemsSource="{Binding SearchResultsData}" MouseDoubleClick="ListView_MouseDoubleClick">
+                            <ListView x:Name="tvSearchResults" Grid.Row="1" VerticalAlignment="Stretch" ItemsSource="{Binding SearchResultsData}" MouseDoubleClick="ListView_MouseDoubleClick">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Grid ToolTip="{Binding Name}" Width="100">
@@ -86,10 +86,124 @@
                 </Grid>
             </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Library}">
-                <TabControl>
-                    <TabItem Header="{Binding SelectedLanguage.Reading}"></TabItem>
-                    <TabItem Header="{Binding SelectedLanguage.Finished}"></TabItem>
-                    <TabItem Header="{Binding SelectedLanguage.Abandoned}"></TabItem>
+                <TabControl x:Name="c_LibraryTabTC">
+                    <TabItem Header="{Binding SelectedLanguage.Reading}">
+                        <ListView ItemsSource="{Binding ReadingData}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <!-- fill grid background-->
+                                        <Image Grid.Row="0" Grid.Column="0" Width="100" Source="{Binding Image, Converter={StaticResource StringToImageSourceValueConverter}}"/>
+                                        <TextBlock Text="{Binding UnreadChapters}" Foreground="White" Background="Black" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,0" Visibility="Visible">
+                                            <TextBlock  Text="{Binding Name}" FontWeight="Normal" Foreground="Gray" FontSize="15"/>
+                                            <TextBlock  Text="{Binding AlternateName}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding YearOfRelease}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Status, Converter={StaticResource MangaStatusToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Type, Converter={StaticResource MangaTypeToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Author}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Genre}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Website}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+
+                            </ListView.ItemTemplate>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
+												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+												MinWidth="{Binding ItemWidth, RelativeSource={RelativeSource Self}}"
+												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="{Binding SelectedLanguage.Finished}">
+                        <ListView ItemsSource="{Binding FinishedData}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <!-- fill grid background-->
+                                        <Image Grid.Row="0" Grid.Column="0" Width="100" Source="{Binding Image, Converter={StaticResource StringToImageSourceValueConverter}}"/>
+                                        <TextBlock Text="{Binding UnreadChapters}" Foreground="White" Background="Black" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,0" Visibility="Visible">
+                                            <TextBlock  Text="{Binding Name}" FontWeight="Normal" Foreground="Gray" FontSize="15"/>
+                                            <TextBlock  Text="{Binding AlternateName}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding YearOfRelease}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Status, Converter={StaticResource MangaStatusToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Type, Converter={StaticResource MangaTypeToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Author}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Genre}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Website}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+
+                            </ListView.ItemTemplate>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
+												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+												MinWidth="{Binding ItemWidth, RelativeSource={RelativeSource Self}}"
+												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="{Binding SelectedLanguage.Abandoned}">
+                        <ListView ItemsSource="{Binding AbandonedData}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <!-- fill grid background-->
+                                        <Image Grid.Row="0" Grid.Column="0" Width="100" Source="{Binding Image, Converter={StaticResource StringToImageSourceValueConverter}}"/>
+                                        <TextBlock Text="{Binding UnreadChapters}" Foreground="White" Background="Black" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,0" Visibility="Visible">
+                                            <TextBlock  Text="{Binding Name}" FontWeight="Normal" Foreground="Gray" FontSize="15"/>
+                                            <TextBlock  Text="{Binding AlternateName}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding YearOfRelease}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Status, Converter={StaticResource MangaStatusToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Type, Converter={StaticResource MangaTypeToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Author}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Genre}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            <TextBlock  Text="{Binding Website}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+
+                            </ListView.ItemTemplate>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
+												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+												MinWidth="{Binding ItemWidth, RelativeSource={RelativeSource Self}}"
+												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                    </TabItem>
                 </TabControl>
             </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Chapters}"></TabItem>
