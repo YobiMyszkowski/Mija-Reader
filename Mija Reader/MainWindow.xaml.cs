@@ -31,6 +31,12 @@ namespace Mija_Reader
             get { return _SearchPluginData; }
             set { _SearchPluginData = value; }
         }
+        private ObservableCollection<BaseMangaSource.MangaSearchData> _SearchResultsData = new ObservableCollection<BaseMangaSource.MangaSearchData>();
+        public ObservableCollection<BaseMangaSource.MangaSearchData> SearchResultsData
+        {
+            get { return _SearchResultsData; }
+            set { _SearchResultsData = value; }
+        }
         private Core.BaseLanguage _SelectedLanguage = new Core.BaseLanguage();
         public Core.BaseLanguage SelectedLanguage
         {
@@ -280,5 +286,255 @@ namespace Mija_Reader
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
+
+        private void c_SearchCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            parser = SearchPluginData.ElementAt((sender as ComboBox).SelectedIndex);
+            c_SearchCB.ToolTip = parser.Website + ", " + parser.Lang + ", " + parser.Author;
+
+            MyIni.Write("MangaSource", parser.Website, "WindowData");
+        }
+
+        private async void SearchTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter) // if 'Enter' is pressed
+            {
+                SearchResultsData.Clear();
+
+                if (c_SearchCB.SelectedItem != null)
+                {
+                    try
+                    {
+                        if (parser != null)
+                        {
+                            var result = await parser.ParseSearchAsync(tvSearchText.Text.ToString(), false, 0, SearchResultsData);
+                            if (result == true)
+                            {
+                                if (SearchResultsData.Count > 0)
+                                {
+                                    if (SearchResultsData.FirstOrDefault().NextPage > SearchResultsData.FirstOrDefault().FirstPage)
+                                    {
+                                        tvSearchNext.ToolTip = SearchResultsData.FirstOrDefault().NextPage;
+                                        tvSearchNext.IsEnabled = true;
+                                    }
+                                    else
+                                    {
+                                        tvSearchNext.ToolTip = "";
+                                        tvSearchNext.IsEnabled = false;
+                                    }
+                                    if (SearchResultsData.FirstOrDefault().PrevPage < SearchResultsData.FirstOrDefault().NextPage)
+                                    {
+                                        tvSearchPrev.ToolTip = SearchResultsData.FirstOrDefault().PrevPage;
+                                        tvSearchPrev.IsEnabled = true;
+                                    }
+                                    else
+                                    {
+                                        tvSearchPrev.ToolTip = "";
+                                        tvSearchPrev.IsEnabled = false;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //ShowMessage(_viewModel.Error, "Something went wrong while searching -.-", MessageBoxMessage.error);
+                                //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.Message);
+                        //ShowMessage(_viewModel.Error, ex.Message, MessageBoxMessage.error);
+                        //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                    }
+                }
+                else
+                {
+                    //ShowMessage(_viewModel.Information, _viewModel.SelectMangaSourceMessage, MessageBoxMessage.error);
+                    //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                }
+            }
+        }
+
+        private async void tvSearchPrev_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResultsData.Clear();
+
+            if (c_SearchCB.SelectedItem != null)
+            {
+                try
+                {
+                    if (parser != null)
+                    {
+
+                        var result = await parser.ParseSearchAsync(tvSearchText.Text.ToString(), false, Int32.Parse(tvSearchPrev.ToolTip.ToString()), SearchResultsData);
+
+                        if (result == true)
+                        {
+                            if (SearchResultsData.Count > 0)
+                            {
+                                if (SearchResultsData.FirstOrDefault().NextPage > SearchResultsData.FirstOrDefault().FirstPage)
+                                {
+                                    tvSearchNext.ToolTip = SearchResultsData.FirstOrDefault().NextPage;
+
+                                    tvSearchNext.IsEnabled = true;
+                                }
+                                else
+                                {
+                                    tvSearchNext.ToolTip = "";
+
+                                    tvSearchNext.IsEnabled = false;
+                                }
+                                if (SearchResultsData.FirstOrDefault().PrevPage < SearchResultsData.FirstOrDefault().NextPage)
+                                {
+                                    tvSearchPrev.ToolTip = SearchResultsData.FirstOrDefault().PrevPage;
+                                    tvSearchPrev.IsEnabled = true;
+                                }
+                                else
+                                {
+                                    tvSearchPrev.ToolTip = "";
+                                    tvSearchPrev.IsEnabled = false;
+                                }
+                            }
+                            else
+                            {
+                                tvSearchNext.ToolTip = parser.FirstPage;
+
+                                result = await parser.ParseSearchAsync(tvSearchText.Text.ToString(), false, Int32.Parse(tvSearchPrev.ToolTip.ToString()), SearchResultsData);
+                                if (result == true)
+                                {
+                                    if (SearchResultsData.Count > 0)
+                                    {
+                                        if (SearchResultsData.FirstOrDefault().NextPage > SearchResultsData.FirstOrDefault().FirstPage)
+                                        {
+                                            tvSearchNext.ToolTip = SearchResultsData.FirstOrDefault().NextPage;
+
+                                            tvSearchNext.IsEnabled = true;
+                                        }
+                                        else
+                                        {
+                                            tvSearchNext.ToolTip = "";
+
+                                            tvSearchNext.IsEnabled = false;
+                                        }
+                                        if (SearchResultsData.FirstOrDefault().PrevPage < SearchResultsData.FirstOrDefault().NextPage)
+                                        {
+                                            tvSearchPrev.ToolTip = SearchResultsData.FirstOrDefault().PrevPage;
+                                            tvSearchPrev.IsEnabled = true;
+                                        }
+                                        else
+                                        {
+                                            tvSearchPrev.ToolTip = "";
+                                            tvSearchPrev.IsEnabled = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //ShowMessage(_viewModel.Error, "Something went wrong while searching -.-", MessageBoxMessage.error);
+                            //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //ShowMessage(_viewModel.Error, ex.Message, MessageBoxMessage.error);
+                    //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                }
+            }
+
+        }
+
+        private async void tvSearchNext_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResultsData.Clear();
+
+            if (c_SearchCB.SelectedItem != null)
+            {
+                try
+                {
+                    if (parser != null)
+                    {
+
+                        var result = await parser.ParseSearchAsync(tvSearchText.Text.ToString(), false, Int32.Parse(tvSearchNext.ToolTip.ToString()), SearchResultsData);
+
+                        if (result == true)
+                        {
+                            if (SearchResultsData.Count > 0)
+                            {
+                                if (SearchResultsData.FirstOrDefault().NextPage > SearchResultsData.FirstOrDefault().FirstPage)
+                                {
+                                    tvSearchNext.ToolTip = SearchResultsData.FirstOrDefault().NextPage;
+
+                                    tvSearchNext.IsEnabled = true;
+                                }
+                                else
+                                {
+                                    tvSearchNext.ToolTip = "";
+
+                                    tvSearchNext.IsEnabled = false;
+                                }
+                                if (SearchResultsData.FirstOrDefault().PrevPage < SearchResultsData.FirstOrDefault().NextPage)
+                                {
+                                    tvSearchPrev.ToolTip = SearchResultsData.FirstOrDefault().PrevPage;
+                                    tvSearchPrev.IsEnabled = true;
+                                }
+                                else
+                                {
+                                    tvSearchPrev.ToolTip = "";
+                                    tvSearchPrev.IsEnabled = false;
+                                }
+                            }
+                            else
+                            {
+                                tvSearchNext.ToolTip = parser.FirstPage;
+
+                                result = await parser.ParseSearchAsync(tvSearchText.Text.ToString(), false, Int32.Parse(tvSearchNext.ToolTip.ToString()), SearchResultsData);
+                                if (result == true)
+                                {
+                                    if (SearchResultsData.Count > 0)
+                                    {
+                                        if (SearchResultsData.FirstOrDefault().NextPage > SearchResultsData.FirstOrDefault().FirstPage)
+                                        {
+                                            tvSearchNext.ToolTip = SearchResultsData.FirstOrDefault().NextPage;
+
+                                            tvSearchNext.IsEnabled = true;
+                                        }
+                                        else
+                                        {
+                                            tvSearchNext.ToolTip = "";
+
+                                            tvSearchNext.IsEnabled = false;
+                                        }
+                                        if (SearchResultsData.FirstOrDefault().PrevPage < SearchResultsData.FirstOrDefault().NextPage)
+                                        {
+                                            tvSearchPrev.ToolTip = SearchResultsData.FirstOrDefault().PrevPage;
+                                            tvSearchPrev.IsEnabled = true;
+                                        }
+                                        else
+                                        {
+                                            tvSearchPrev.ToolTip = "";
+                                            tvSearchPrev.IsEnabled = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //ShowMessage(_viewModel.Error, "Something went wrong while searching -.-", MessageBoxMessage.error);
+                            //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //ShowMessage(_viewModel.Error, ex.Message, MessageBoxMessage.error);
+                    //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                }
+            }
+            }
     }
 }

@@ -167,6 +167,7 @@ namespace MangaParser
                 }
 
                 int NextPage = 0;
+                int PrevPage = 0;
                 if (IgnorePages != true)
                 {
                     Match match = Regex.Match(result.ToString(), @"<div id=""sp"">(.*?)</div>", RegexOptions.IgnoreCase);
@@ -180,6 +181,11 @@ namespace MangaParser
                             {
                                 NextPage = Convert.ToInt32(match.Groups[1].Value.Split('=').Last());
                             }
+                            else if (match.Groups[2].Value == "<" || match.Groups[2].Value == "&lt;")
+                            {
+                                PrevPage = Convert.ToInt32(match.Groups[1].Value.Split('=').Last());
+                            }
+
                             match = match.NextMatch();
                             if (match.Index == 0)
                                 break;
@@ -189,7 +195,7 @@ namespace MangaParser
 
                 for (int i = 0; i < Covers.Count; i++)
                 {
-                    SearchResults.Add(new MangaSearchData() { Name = Names[i].ToString(), Image = Covers[i].ToString(), Website = Websites[i].ToString(), FirstPage = Page, NextPage = NextPage });
+                    SearchResults.Add(new MangaSearchData() { Name = Names[i].ToString(), Image = Covers[i].ToString(), Website = Websites[i].ToString(), FirstPage = Page, NextPage = NextPage, PrevPage = PrevPage });
                 }
 
 

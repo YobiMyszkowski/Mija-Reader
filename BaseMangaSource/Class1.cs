@@ -25,6 +25,8 @@ namespace BaseMangaSource
         public string Image { get { return _Image; } set { if (_Image != value) { _Image = value; RaisePropertyChanged("Image"); } } } // Url to image
         private int _NextPage;
         public int NextPage { get { return _NextPage; } set { if (_NextPage != value) { _NextPage = value; RaisePropertyChanged("NextPage"); } } } // Value for next page
+        private int _PrevPage;
+        public int PrevPage { get { return _PrevPage; } set { if (_PrevPage != value) { _PrevPage = value; RaisePropertyChanged("PrevPage"); } } } // Value for previous page
         private int _FirstPage;
         public int FirstPage { get { return _FirstPage; } set { if (_FirstPage != value) { _FirstPage = value; RaisePropertyChanged("FirstPage"); } } } // Value for first page
         private string _ErrorMessage;
