@@ -30,9 +30,17 @@
         public string No { get { return "No"; } }
         public string Cancel { get { return "Cancel"; } }
         public string Ok { get { return "Ok"; } }
-        public string MangaAlreadyExist { get { return "Manga {0} is already exist in your library. You can Find it in {1}."; } }
+        public string MangaAlreadyExist { get { return "Manga '{0}' is already exist in your library. You can Find it in '{1}'."; } }
         public string SomethingWentWrong { get { return "Something went wrong while searching."; } }
         public string NoSelectedSource { get { return "There isn't any manga source selected. If you can't select any, that mean plugins wan't installed succesfully. Please reinstall program or add sources manually into proper folder."; } }
 
+        public string ShowChapters { get { return "Show chapters"; } }
+        public string Move { get { return "Move:"; } }
+        public string MoveTo { get { return "Move to:"; } }
+        public string Up { get { return "up"; } }
+        public string Down { get { return "down"; } }
+        public string Top { get { return "beginning"; } }
+        public string End { get { return "end"; } }
+        public string RemoveFromLibrary { get { return "Remove from library"; } }
     }
 }

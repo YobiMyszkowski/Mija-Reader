@@ -20,10 +20,14 @@
                     </Grid.ColumnDefinitions>
 
                     <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
-                        <ListView></ListView>
+                        <ListView>
+                            
+                        </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
-                        <ListView></ListView>
+                        <ListView>
+                            
+                        </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="2" Header="{Binding SelectedLanguage.Search}" MinWidth="200">
                         <Grid>
@@ -88,7 +92,24 @@
             <TabItem Header="{Binding SelectedLanguage.Library}">
                 <TabControl x:Name="c_LibraryTabTC">
                     <TabItem Header="{Binding SelectedLanguage.Reading}">
-                        <ListView ItemsSource="{Binding ReadingData}">
+                        <ListView ItemsSource="{Binding ReadingData}" ContextMenu="{DynamicResource MainCM}" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                            <ListView.Resources>
+                                <ContextMenu x:Key="MainCM">
+                                    <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
+                                    <MenuItem Header="{Binding SelectedLanguage.Move}" IsEnabled="False">
+                                        <MenuItem Header="{Binding SelectedLanguage.Up}" Click="MoveUp" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Down}" Click="MoveDown" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Top}" Click="MoveTop" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.End}" Click="MoveEnd" IsEnabled="False"/>
+                                    </MenuItem>
+                                    <MenuItem Header="{Binding SelectedLanguage.MoveTo}" IsEnabled="False">
+                                        <MenuItem Header="{Binding SelectedLanguage.Finished, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToFinished" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Abandoned, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToAbandoned" IsEnabled="False"/>
+                                    </MenuItem>
+                                    <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
+												CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
+                                </ContextMenu>
+                            </ListView.Resources>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -127,7 +148,24 @@
                         </ListView>
                     </TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Finished}">
-                        <ListView ItemsSource="{Binding FinishedData}">
+                        <ListView ItemsSource="{Binding FinishedData}" ContextMenu="{DynamicResource MainCM}" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                            <ListView.Resources>
+                                <ContextMenu x:Key="MainCM">
+                                    <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
+                                    <MenuItem Header="{Binding SelectedLanguage.Move}" IsEnabled="False">
+                                        <MenuItem Header="{Binding SelectedLanguage.Up}" Click="MoveUp" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Down}" Click="MoveDown" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Top}" Click="MoveTop" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.End}" Click="MoveEnd" IsEnabled="False"/>
+                                    </MenuItem>
+                                    <MenuItem Header="{Binding SelectedLanguage.MoveTo}" IsEnabled="False">
+                                        <MenuItem Header="{Binding SelectedLanguage.Reading, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToReading" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Abandoned, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToAbandoned" IsEnabled="False"/>
+                                    </MenuItem>
+                                    <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
+												CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
+                                </ContextMenu>
+                            </ListView.Resources>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -166,7 +204,24 @@
                         </ListView>
                     </TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Abandoned}">
-                        <ListView ItemsSource="{Binding AbandonedData}">
+                        <ListView ItemsSource="{Binding AbandonedData}" ContextMenu="{DynamicResource MainCM}" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                            <ListView.Resources>
+                                <ContextMenu x:Key="MainCM">
+                                    <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
+                                    <MenuItem Header="{Binding SelectedLanguage.Move}" IsEnabled="False">
+                                        <MenuItem Header="{Binding SelectedLanguage.Up}" Click="MoveUp" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Down}" Click="MoveDown" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Top}" Click="MoveTop" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.End}" Click="MoveEnd" IsEnabled="False"/>
+                                    </MenuItem>
+                                    <MenuItem Header="{Binding SelectedLanguage.MoveTo}" IsEnabled="False">
+                                        <MenuItem Header="{Binding SelectedLanguage.Reading, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToReading" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Finished, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToFinished" IsEnabled="False"/>
+                                    </MenuItem>
+                                    <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
+												CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
+                                </ContextMenu>
+                            </ListView.Resources>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>

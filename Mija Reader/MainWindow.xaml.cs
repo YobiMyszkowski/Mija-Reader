@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Navigation;
 using System.Windows.Media.Imaging;
 using DropNet;
-
+using System.Collections.Generic;
 using Mija_Reader.AdditionalControls;
 
 namespace System.Windows.Controls
@@ -31,6 +31,53 @@ namespace System.Windows.Controls
         public static void PerformClick(this Button btn)
         {
             btn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        }
+        public static IEnumerable<DependencyObject> GetChildObjects(
+                                   this DependencyObject parent)
+        {
+            if (parent == null) yield break;
+
+
+            if (parent is ContentElement || parent is FrameworkElement)
+            {
+                //use the logical tree for content / framework elements
+                foreach (object obj in LogicalTreeHelper.GetChildren(parent))
+                {
+                    var depObj = obj as DependencyObject;
+                    if (depObj != null) yield return (DependencyObject)obj;
+                }
+            }
+            else
+            {
+                //use the visual tree per default
+                int count = VisualTreeHelper.GetChildrenCount(parent);
+                for (int i = 0; i < count; i++)
+                {
+                    yield return VisualTreeHelper.GetChild(parent, i);
+                }
+            }
+        }
+        public static IEnumerable<T> FindChildren<T>(this DependencyObject source)
+                                             where T : DependencyObject
+        {
+            if (source != null)
+            {
+                var childs = GetChildObjects(source);
+                foreach (DependencyObject child in childs)
+                {
+                    //analyze if children match the requested type
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    //recurse tree
+                    foreach (T descendant in FindChildren<T>(child))
+                    {
+                        yield return descendant;
+                    }
+                }
+            }
         }
     }
 }
@@ -360,7 +407,6 @@ namespace Mija_Reader
             SelectedLanguage.LastRead = c.LastRead;
             SelectedLanguage.NewChapters = c.NewChapters;
             SelectedLanguage.Search = c.Search;
-
             SelectedLanguage.Information = c.Information;
             SelectedLanguage.Warning = c.Warning;
             SelectedLanguage.Error = c.Error;
@@ -371,11 +417,17 @@ namespace Mija_Reader
             SelectedLanguage.MangaAlreadyExist = c.MangaAlreadyExist;
             SelectedLanguage.SomethingWentWrong = c.SomethingWentWrong;
             SelectedLanguage.NoSelectedSource = c.NoSelectedSource;
-
+            SelectedLanguage.ShowChapters = c.ShowChapters;
+            SelectedLanguage.Move = c.Move;
+            SelectedLanguage.MoveTo = c.MoveTo;
+            SelectedLanguage.Up = c.Up;
+            SelectedLanguage.Down = c.Down;
+            SelectedLanguage.Top = c.Top;
+            SelectedLanguage.End = c.End;
+            SelectedLanguage.RemoveFromLibrary = c.RemoveFromLibrary;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
-
         private void c_SearchCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             parser = SearchPluginData.ElementAt((sender as ComboBox).SelectedIndex);
@@ -383,7 +435,6 @@ namespace Mija_Reader
 
             MyIni.Write("MangaSource", parser.Website, "WindowData");
         }
-
         private async void SearchTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Enter) // if 'Enter' is pressed
@@ -427,6 +478,7 @@ namespace Mija_Reader
                             {
                                 MetroMessageBox mbox = new MetroMessageBox();
                                 mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                                mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
                                 mbox.ShowMessage(this, SelectedLanguage.SomethingWentWrong, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                             }
                         }
@@ -440,11 +492,11 @@ namespace Mija_Reader
                 {
                     MetroMessageBox mbox = new MetroMessageBox();
                     mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                    mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
                     mbox.ShowMessage(this, SelectedLanguage.NoSelectedSource, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                 }
             }
         }
-
         private async void tvSearchPrev_Click(object sender, RoutedEventArgs e)
         {
             SearchResultsData.Clear();
@@ -524,6 +576,7 @@ namespace Mija_Reader
                         {
                             MetroMessageBox mbox = new MetroMessageBox();
                             mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                            mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
                             mbox.ShowMessage(this, SelectedLanguage.SomethingWentWrong, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                         }
                     }
@@ -535,7 +588,6 @@ namespace Mija_Reader
             }
 
         }
-
         private async void tvSearchNext_Click(object sender, RoutedEventArgs e)
         {
             SearchResultsData.Clear();
@@ -615,6 +667,7 @@ namespace Mija_Reader
                         {
                             MetroMessageBox mbox = new MetroMessageBox();
                             mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                            mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
                             mbox.ShowMessage(this, SelectedLanguage.SomethingWentWrong, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                         }
                     }
@@ -713,6 +766,7 @@ namespace Mija_Reader
             {
                 MetroMessageBox mbox = new MetroMessageBox();
                 mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                mbox.MessageBoxBtnYes.Content = SelectedLanguage.Ok;
                 mbox.ShowMessage(this, string.Format(SelectedLanguage.MangaAlreadyExist, SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name, foundIn ), SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
             }
             else
@@ -728,6 +782,178 @@ namespace Mija_Reader
                     c_LibraryTabTC.SelectedIndex = 0;
 
                     library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
+                }
+            }
+        }
+        private void MoveItem(int direction)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                BaseMangaSource.MangaPageData panel = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+                int oldIndex = selectedListView.FirstOrDefault().SelectedIndex;
+                int newIndex = selectedListView.FirstOrDefault().SelectedIndex + direction;
+                int itemsCount = data.Count;
+                if (panel != null)
+                {
+                    if (newIndex < 0 || newIndex >= itemsCount)
+                        return; // Index out of range - close
+
+                    data.Move(oldIndex, newIndex);
+                    if (direction == 1) //down
+                    {
+                        library.MoveMangaUpDown(panel.Name, panel.Website, false);
+                    }
+                    else //up
+                    {
+                        library.MoveMangaUpDown(panel.Name, panel.Website, true);
+                    }
+                }
+            }
+        }
+        private void MoveItemTopEnd(bool direction)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                BaseMangaSource.MangaPageData panel = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+                int oldIndex = selectedListView.FirstOrDefault().SelectedIndex;
+                int newIndex = 0;
+                if (direction == true)
+                    newIndex = 0;
+                else
+                    newIndex = data.Count - 1;
+
+                int itemsCount = data.Count;
+                if (panel != null)
+                {
+                    if (newIndex < 0 || newIndex >= itemsCount)
+                        return; // Index out of range - nothing to do
+                    data.Move(oldIndex, newIndex);
+
+                    if (direction == true) //top
+                    {
+                        library.MoveMangaTopEnd(panel.Name, panel.Website, false);
+                    }
+                    else //end
+                    {
+                        library.MoveMangaTopEnd(panel.Name, panel.Website, true);
+                    }
+                }
+            }
+        }
+        private void MoveUp(object sender, RoutedEventArgs e)
+        {
+            MoveItem(-1);
+        }
+        private void MoveDown(object sender, RoutedEventArgs e)
+        {
+            MoveItem(1);
+        }
+        private void MoveTop(object sender, RoutedEventArgs e)
+        {
+            MoveItemTopEnd(true);
+        }
+        private void MoveEnd(object sender, RoutedEventArgs e)
+        {
+            MoveItemTopEnd(false);
+        }
+        private void MenuItem_Click_MoveToReading(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                library.ChangePlace(data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Name, data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Website, Core.PlaceInLibrary.Reading);
+                ReadingData.Add(data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex));
+                data.RemoveAt(selectedListView.FirstOrDefault().SelectedIndex);  
+            }
+        }
+        private void MenuItem_Click_MoveToFinished(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                library.ChangePlace(data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Name, data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Website, Core.PlaceInLibrary.Finished);
+                FinishedData.Add(data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex));
+                data.RemoveAt(selectedListView.FirstOrDefault().SelectedIndex);
+            }
+        }
+        private void MenuItem_Click_MoveToAbandoned(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                library.ChangePlace(data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Name, data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Website, Core.PlaceInLibrary.Abandoned);
+                AbandonedData.Add(data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex));
+                data.RemoveAt(selectedListView.FirstOrDefault().SelectedIndex);         
+            }
+        }
+        private void MenuItem_Click_RemoveFromLibrary(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren< ListView>();
+            ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+            if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+            {
+                library.RemoveMangaAndAllData(data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Name, data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex).Website);
+                data.RemoveAt(selectedListView.FirstOrDefault().SelectedIndex);              
+            }
+        }
+        private void MenuItem_Click_ShowChaptersLibrary(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void tvLibrary_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+            if (selectedListView.FirstOrDefault().SelectedItem != null)
+            {
+                // Enable all contextmenu items
+                ContextMenu cMenu = (selectedListView.FirstOrDefault().Resources["MainCM"] as System.Windows.Controls.ContextMenu);
+                foreach (MenuItem childMenu in cMenu.Items)
+                {
+                    childMenu.IsEnabled = true;
+                    if (childMenu.HasItems)
+                    {
+                        foreach (MenuItem childsOfChildMenu in childMenu.Items)
+                        {
+                            childsOfChildMenu.IsEnabled = true;
+                        }
+                    }
+                }
+                if (selectedListView.FirstOrDefault().SelectedIndex == 0)
+                {
+                    ((cMenu.Items[1] as MenuItem).Items[0] as MenuItem).IsEnabled = false; // disable move up
+                    ((cMenu.Items[1] as MenuItem).Items[2] as MenuItem).IsEnabled = false; // disable move to beginning
+                }
+                ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+                if (selectedListView.FirstOrDefault().SelectedIndex == data.Count - 1)
+                {
+                    ((cMenu.Items[1] as MenuItem).Items[1] as MenuItem).IsEnabled = false; // disable move down
+                    ((cMenu.Items[1] as MenuItem).Items[3] as MenuItem).IsEnabled = false; // disable move to end
+                }
+            }
+            else
+            {
+                // disable all contextmenu items
+                if (selectedListView.FirstOrDefault().SelectedIndex == -1)
+                {
+                    ContextMenu cMenu = ((sender as ListView).Resources["MainCM"] as System.Windows.Controls.ContextMenu);
+                    foreach (MenuItem childMenu in cMenu.Items)
+                    {
+                        childMenu.IsEnabled = false;
+                        if (childMenu.HasItems)
+                        {
+                            foreach (MenuItem childsOfChildMenu in childMenu.Items)
+                            {
+                                childsOfChildMenu.IsEnabled = false;
+                            }
+                        }
+                    }
                 }
             }
         }

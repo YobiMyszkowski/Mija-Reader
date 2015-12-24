@@ -164,6 +164,55 @@ namespace Mija_Reader.Core
             get { return _NoSelectedSource; }
             set { _NoSelectedSource = value; RaisePropertyChanged("NoSelectedSource"); }
         }
+        private string _ShowChapters = "Show chapters";
+        public string ShowChapters
+        {
+            get { return _ShowChapters; }
+            set { _ShowChapters = value; RaisePropertyChanged("ShowChapters"); }
+        }
+        private string _Move = "Move:";
+        public string Move
+        {
+            get { return _Move; }
+            set { _Move = value; RaisePropertyChanged("Move"); }
+        }
+        private string _MoveTo = "Move to:";
+        public string MoveTo
+        {
+            get { return _MoveTo; }
+            set { _MoveTo = value; RaisePropertyChanged("MoveTo"); }
+        }
+        private string _Up = "Up";
+        public string Up
+        {
+            get { return _Up; }
+            set { _Up = value; RaisePropertyChanged("Up"); }
+        }
+        private string _Down = "Down";
+        public string Down
+        {
+            get { return _Down; }
+            set { _Down = value; RaisePropertyChanged("Down"); }
+        }
+        private string _Top = "beginning";
+        public string Top
+        {
+            get { return _Top; }
+            set { _Top = value; RaisePropertyChanged("Top"); }
+        }
+        private string _End = "end";
+        public string End
+        {
+            get { return _End; }
+            set { _End = value; RaisePropertyChanged("End"); }
+        }
+        private string _RemoveFromLibrary = "Remove from library";
+        public string RemoveFromLibrary
+        {
+            get { return _RemoveFromLibrary; }
+            set { _RemoveFromLibrary = value; RaisePropertyChanged("RemoveFromLibrary"); }
+        }
+
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

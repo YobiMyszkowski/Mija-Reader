@@ -33,7 +33,15 @@
         public string MangaAlreadyExist { get { return "Manga '{0}' jest już w twojej bibliotece. Możesz ją znaleźć w '{1}'."; } }
         public string SomethingWentWrong { get { return "Coś poszło nie tak podczas szukania."; } }
         public string NoSelectedSource { get { return "Nie wybrano żadnego źródła mangi. Jeżeli nie możesz wybrać żadnego to prawdopodobnie nie zostaly one zainstalowane poprawnie. Proszę o przeinstalowanie programu albo dodanie żródeł mang do odpowiedniego folderu."; } }
-
+        
+        public string ShowChapters { get { return "Pokaż rozdziały"; } }
+        public string Move { get { return "Przenieś:"; } }
+        public string MoveTo { get { return "Przenieś do:"; } }
+        public string Up { get { return "do góry"; } }
+        public string Down { get { return "do dołu"; } }
+        public string Top { get { return "na początek"; } }
+        public string End { get { return "na koniec"; } }
+        public string RemoveFromLibrary { get { return "Usuń z biblioteki"; } }
 
     }
 }
