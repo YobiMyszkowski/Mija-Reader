@@ -1,16 +1,39 @@
 ﻿using System;
 using System.Linq;
-
 using System.Windows;
 using System.Windows.Controls;
-
-using System.Windows.Navigation;
-using System.Collections.ObjectModel;
 using System.Reflection; //Assembly
+using System.Windows.Documents;
+using System.Windows.Media;
+using System.Collections.ObjectModel;
+using System.Windows.Navigation;
+using System.Windows.Media.Imaging;
 using DropNet;
 
 using Mija_Reader.AdditionalControls;
 
+namespace System.Windows.Controls
+{
+    public static class MyExt2
+    {
+        public static void AppendText(this RichTextBox box, string text, string color)
+        {
+            BrushConverter bc = new BrushConverter();
+            TextRange tr = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd);
+            tr.Text = text;
+            try
+            {
+                tr.ApplyPropertyValue(TextElement.ForegroundProperty,
+                    bc.ConvertFromString(color));
+            }
+            catch (FormatException) { }
+        }
+        public static void PerformClick(this Button btn)
+        {
+            btn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        }
+    }
+}
 namespace Mija_Reader
 {
     public partial class MainWindow : Window
@@ -26,6 +49,18 @@ namespace Mija_Reader
         {
             get { return _Languages; }
             set { _Languages = value; }
+        }
+        ObservableCollection<BaseMangaSource.MangaPageData> _DetailedInfo = new ObservableCollection<BaseMangaSource.MangaPageData>();
+        public ObservableCollection<BaseMangaSource.MangaPageData> DetailedInfo
+        {
+            get { return _DetailedInfo; }
+            set { _DetailedInfo = value; }
+        }
+        ObservableCollection<BaseMangaSource.MangaPageChapters> _ChaptersInfo = new ObservableCollection<BaseMangaSource.MangaPageChapters>();
+        public ObservableCollection<BaseMangaSource.MangaPageChapters> ChaptersInfo
+        {
+            get { return _ChaptersInfo; }
+            set { _ChaptersInfo = value; }
         }
         private ObservableCollection<BaseMangaSource.IPlugin> _SearchPluginData = new ObservableCollection<BaseMangaSource.IPlugin>();
         public ObservableCollection<BaseMangaSource.IPlugin> SearchPluginData
@@ -201,6 +236,12 @@ namespace Mija_Reader
                 }
             }
             #endregion
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            Application.Current.Shutdown();
         }
         private void Browser_LoadCompleted(object sender, NavigationEventArgs e)
         {
@@ -535,6 +576,71 @@ namespace Mija_Reader
                 catch (Exception ex)
                 {
                     throw new Exception(ex.Message);
+                }
+            }
+        }
+
+        private async void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if((sender as ListView).Items.Count > 0)
+            {
+                if ((sender as ListView).SelectedItem != null)
+                {
+                    MangaDetailsViewer details = new MangaDetailsViewer();
+                    details.Owner = this;
+                    details.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+                    BaseMangaSource.MangaSearchData selectedManga = SearchResultsData.ElementAt((sender as ListView).SelectedIndex);
+                    if (selectedManga != null)
+                    {
+                        DetailedInfo.Clear();
+
+                        var result = await parser.ParseSelectedPageAsync(selectedManga.Website, false, DetailedInfo, ChaptersInfo);
+                        if (result == true)
+                        {
+                            details.tvDetails.Document.Blocks.Clear();
+                            details.tvDescription.Document.Blocks.Clear();
+
+                            details.tvImage.Source = new BitmapImage(new Uri(DetailedInfo.FirstOrDefault().Image));
+
+                            details.tvDescription.AppendText(DetailedInfo.FirstOrDefault().Description, "Gray");
+
+                            details.tvDetails.AppendText("Name" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Name, "Gray");
+                            details.tvDetails.AppendText("\r");
+                            details.tvDetails.AppendText("AlternateName" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().AlternateName, "Gray");
+                            details.tvDetails.AppendText("\r");
+                            details.tvDetails.AppendText("YearOfRelease" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().YearOfRelease, "Gray");
+                            details.tvDetails.AppendText("\r");
+                            details.tvDetails.AppendText("Status" + ": ", "LightBlue");
+                            if (DetailedInfo.FirstOrDefault().Status == BaseMangaSource.MangaStatus.Completed)
+                                details.tvDetails.AppendText("Completed", "Gray");
+                            else
+                                details.tvDetails.AppendText("Ongoing", "Gray");
+                            details.tvDetails.AppendText("\r");
+                            details.tvDetails.AppendText("Author" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Author, "Gray");
+                            details.tvDetails.AppendText("\r");
+                            details.tvDetails.AppendText("Artist" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Artist, "Gray");
+                            details.tvDetails.AppendText("\r");
+                            details.tvDetails.AppendText("Directin" + ": ", "LightBlue");
+                            if (DetailedInfo.FirstOrDefault().Type == BaseMangaSource.MangaType.Manga_RightToLeft)
+                                details.tvDetails.AppendText("manga", "Gray");
+                            else
+                                details.tvDetails.AppendText("manhwa", "Gray");
+                            details.tvDetails.AppendText("\r");
+                            details.tvDetails.AppendText("Genre" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Genre, "Gray");
+                            details.tvDetails.AppendText("\r");
+                        }
+                        else
+                        {
+                        }
+                    }
+                    details.ShowDialog();
                 }
             }
         }

@@ -53,7 +53,7 @@
                                 </ComboBox>
                                 <AdditionalControls:SearchTextBox x:Name="tvSearchText" Watermark="searching quote" KeyUp="SearchTextBox_KeyUp"/>
                             </StackPanel>
-                            <ListView Grid.Row="1" VerticalAlignment="Stretch" ItemsSource="{Binding SearchResultsData}">
+                            <ListView Grid.Row="1" VerticalAlignment="Stretch" ItemsSource="{Binding SearchResultsData}" MouseDoubleClick="ListView_MouseDoubleClick">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Grid ToolTip="{Binding Name}" Width="100">
