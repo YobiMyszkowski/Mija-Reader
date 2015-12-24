@@ -18,12 +18,18 @@ namespace Mija_Reader
         private const string _appsecret = "8gn5q15w1fy3gpm";
         DropNetClient _client = null;
         Core.Ini MyIni = null;
-
+        BaseMangaSource.IPlugin parser;
         private ObservableCollection<dynamic> _Languages = new ObservableCollection<dynamic>();
         public ObservableCollection<dynamic> Languages
         {
             get { return _Languages; }
             set { _Languages = value; }
+        }
+        private ObservableCollection<BaseMangaSource.IPlugin> _SearchPluginData = new ObservableCollection<BaseMangaSource.IPlugin>();
+        public ObservableCollection<BaseMangaSource.IPlugin> SearchPluginData
+        {
+            get { return _SearchPluginData; }
+            set { _SearchPluginData = value; }
         }
         private Core.BaseLanguage _SelectedLanguage = new Core.BaseLanguage();
         public Core.BaseLanguage SelectedLanguage
@@ -90,6 +96,52 @@ namespace Mija_Reader
             else
             {
                 c_LanguageCB.IsEnabled = false;
+            }
+            #endregion
+
+            #region load_Manga Sources
+            if (System.IO.Directory.Exists(System.IO.Directory.GetCurrentDirectory().ToString() + @"\Data\MangaSources\") == true)
+            {
+                string[] filePaths = System.IO.Directory.GetFiles(Environment.CurrentDirectory.ToString() + @"\Data\MangaSources\", "*Parser.dll");
+
+                if (filePaths.Count() == 0)
+                {
+                    c_SearchCB.IsEnabled = false;
+                }
+                else
+                {
+                    for (int i = 0; i < filePaths.Count(); i++)
+                    {
+                        try
+                        {
+                            int pos = filePaths.ToList<string>()[i].LastIndexOf(@"\") + 1;                
+                            SearchPluginData.Add(LoadPluginByWebsite(filePaths.ToList<string>()[i].Substring(pos)));
+
+                            if (MyIni.KeyExists("MangaSource", "WindowData"))
+                            {
+                                if (MyIni.Read("MangaSource", "WindowData") == SearchPluginData.ElementAt(i).Website)
+                                {
+                                    parser = SearchPluginData.ElementAt(i);
+                                    c_SearchCB.SelectedIndex = i;
+                                    c_SearchCB.ToolTip = parser.Website + ", " + parser.Lang + ", " + parser.Author;
+                                }
+                            }
+                            else
+                            {
+                                c_SearchCB.SelectedIndex = 0;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(ex.Message);
+                        }
+                        c_SearchCB.IsEnabled = true;
+                    }
+                }
+            }
+            else
+            {
+                c_SearchCB.IsEnabled = false;
             }
             #endregion
 
@@ -175,7 +227,37 @@ namespace Mija_Reader
                 });
             }
         }
+        private BaseMangaSource.IPlugin LoadPluginByWebsite(string website)
+        {
+            Type ObjType = null;
+            try
+            {
+                Assembly ass = null;
+                ass = Assembly.LoadFrom(Environment.CurrentDirectory.ToString() + @"\Data\MangaSources\" + website);
+                if (ass != null)
+                {
+                    ObjType = ass.GetType(@"MangaParser" + ".Parser");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            try
+            {
+                if (ObjType != null)
+                {
+                    parser = (BaseMangaSource.IPlugin)Activator.CreateInstance(ObjType);
+                    c_SearchCB.ToolTip = parser.Website + ", " + parser.Lang + ", " + parser.Author;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
 
+            return parser;
+        }
         private void c_LanguageCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             dynamic c = Languages.ElementAt((sender as ComboBox).SelectedIndex);

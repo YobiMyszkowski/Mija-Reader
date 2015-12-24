@@ -12,21 +12,55 @@
                 <WebBrowser x:Name="loginBrowser"></WebBrowser>
             </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Home}">
-                <StackPanel Orientation="Horizontal">
-                    <GroupBox Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
                         <ListView></ListView>
                     </GroupBox>
-                    <GroupBox Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
+                    <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
                         <ListView></ListView>
                     </GroupBox>
-                    <GroupBox Header="{Binding SelectedLanguage.Search}" MinWidth="200">
-                        <StackPanel>
-                            <ComboBox MaxHeight="20"></ComboBox>
-                            <TextBox MaxHeight="25"></TextBox>
-                            <ListView></ListView>
-                        </StackPanel>
+                    <GroupBox Grid.Column="2" Header="{Binding SelectedLanguage.Search}" MinWidth="200">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0">
+                                <ComboBox x:Name="c_SearchCB" MaxHeight="20" ItemsSource="{Binding SearchPluginData}" IsEnabled="False">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="180"/>
+                                                    <ColumnDefinition Width="20"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Website}" FontWeight="Bold" />
+                                                <Image Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" Source="{Binding Icon}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBox MaxHeight="25"></TextBox>
+                            </StackPanel>
+                            <ListView Grid.Row="1" VerticalAlignment="Stretch"></ListView>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                <Button Content="&lt;&lt;"></Button>
+                                <Button Content="&gt;&gt;"></Button>
+                            </StackPanel>
+                        </Grid>
                     </GroupBox>
-                </StackPanel>
+                </Grid>
             </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Library}">
                 <TabControl>

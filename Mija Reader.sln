@@ -11,6 +11,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Languages", "Languages", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnglishLanguage", "EnglishLanguage\EnglishLanguage.csproj", "{CA05E049-AD14-48E2-B8D8-7043299E9F91}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MangaSources", "MangaSources", "{717CFA28-6A29-4C13-AC8C-F3D195CB809C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MangaReaderNetParser", "MangaReaderNetParser\MangaReaderNetParser.csproj", "{1C4F08FD-1C0E-4863-981D-603ED07E49F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseMangaSource", "BaseMangaSource\BaseMangaSource.csproj", "{DBD92DC4-4A74-4CDF-8048-6E3C783AF4B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +35,14 @@ Global
 		{CA05E049-AD14-48E2-B8D8-7043299E9F91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA05E049-AD14-48E2-B8D8-7043299E9F91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA05E049-AD14-48E2-B8D8-7043299E9F91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C4F08FD-1C0E-4863-981D-603ED07E49F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C4F08FD-1C0E-4863-981D-603ED07E49F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C4F08FD-1C0E-4863-981D-603ED07E49F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C4F08FD-1C0E-4863-981D-603ED07E49F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD92DC4-4A74-4CDF-8048-6E3C783AF4B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD92DC4-4A74-4CDF-8048-6E3C783AF4B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD92DC4-4A74-4CDF-8048-6E3C783AF4B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD92DC4-4A74-4CDF-8048-6E3C783AF4B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,5 +50,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A05336BD-3CCD-4438-BC47-B269407A5F1A} = {6E717CF3-AA43-4EF5-9B42-9400C9BBC6A9}
 		{CA05E049-AD14-48E2-B8D8-7043299E9F91} = {6E717CF3-AA43-4EF5-9B42-9400C9BBC6A9}
+		{1C4F08FD-1C0E-4863-981D-603ED07E49F2} = {717CFA28-6A29-4C13-AC8C-F3D195CB809C}
+		{DBD92DC4-4A74-4CDF-8048-6E3C783AF4B7} = {717CFA28-6A29-4C13-AC8C-F3D195CB809C}
 	EndGlobalSection
 EndGlobal
