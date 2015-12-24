@@ -22,5 +22,17 @@
         public string LastRead { get { return "Last read:"; } }
         public string NewChapters { get { return "Last updated:"; } }
         public string Search { get { return "Search:"; } }
+
+        public string Information { get { return "Information"; } }
+        public string Warning { get { return "Warning"; } }
+        public string Error { get { return "Error"; } }
+        public string Yes { get { return "Yes"; } }
+        public string No { get { return "No"; } }
+        public string Cancel { get { return "Cancel"; } }
+        public string Ok { get { return "Ok"; } }
+        public string MangaAlreadyExist { get { return "Manga {0} is already exist in your library. You can Find it in {1}."; } }
+        public string SomethingWentWrong { get { return "Something went wrong while searching."; } }
+        public string NoSelectedSource { get { return "There isn't any manga source selected. If you can't select any, that mean plugins wan't installed succesfully. Please reinstall program or add sources manually into proper folder."; } }
+
     }
 }

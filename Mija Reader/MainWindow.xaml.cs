@@ -42,6 +42,7 @@ namespace Mija_Reader
         private const string _appsecret = "8gn5q15w1fy3gpm";
         DropNetClient _client = null;
         Core.Ini MyIni = null;
+        Core.XMLLibrary library = new Core.XMLLibrary(@"Data\MangaLibrary.xml");
         BaseMangaSource.IPlugin parser;
         MetroMessageBox mbox = new MetroMessageBox();
         private ObservableCollection<BaseMangaSource.MangaPageData> _ReadingData = new ObservableCollection<BaseMangaSource.MangaPageData>();
@@ -206,8 +207,25 @@ namespace Mija_Reader
             }
             #endregion
 
-            #region InitializeDropBox
+            #region load_Library
+            if (!library.IsFileExist())
+            {
+                if (!library.IsFolderExist())
+                {
+                    library.CreateFolder();
+                }
+                library.Create();
+                library.Load();
+                library.LoadLibrary(ReadingData, FinishedData, AbandonedData);
+            }
+            else
+            {
+                library.Load();
+                library.LoadLibrary(ReadingData, FinishedData, AbandonedData);
+            }
+            #endregion
 
+            #region InitializeDropBox
             if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
             {
                 (c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
@@ -258,7 +276,6 @@ namespace Mija_Reader
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-
             Application.Current.Shutdown();
         }
         private void Browser_LoadCompleted(object sender, NavigationEventArgs e)
@@ -288,8 +305,7 @@ namespace Mija_Reader
                 },
                 (error) =>
                 {
-                    //Handle error
-                    MessageBox.Show(error.Message);
+                    throw new Exception(error.Message);
                 });
             }
         }
@@ -345,6 +361,18 @@ namespace Mija_Reader
             SelectedLanguage.NewChapters = c.NewChapters;
             SelectedLanguage.Search = c.Search;
 
+            SelectedLanguage.Information = c.Information;
+            SelectedLanguage.Warning = c.Warning;
+            SelectedLanguage.Error = c.Error;
+            SelectedLanguage.Yes = c.Yes;
+            SelectedLanguage.No = c.No;
+            SelectedLanguage.Cancel = c.Cancel;
+            SelectedLanguage.Ok = c.Ok;
+            SelectedLanguage.MangaAlreadyExist = c.MangaAlreadyExist;
+            SelectedLanguage.SomethingWentWrong = c.SomethingWentWrong;
+            SelectedLanguage.NoSelectedSource = c.NoSelectedSource;
+
+
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
 
@@ -399,7 +427,7 @@ namespace Mija_Reader
                             {
                                 MetroMessageBox mbox = new MetroMessageBox();
                                 mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
-                                mbox.ShowMessage(this, "Something went wrong while searching", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
+                                mbox.ShowMessage(this, SelectedLanguage.SomethingWentWrong, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                             }
                         }
                     }
@@ -412,7 +440,7 @@ namespace Mija_Reader
                 {
                     MetroMessageBox mbox = new MetroMessageBox();
                     mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
-                    mbox.ShowMessage(this, "There isn't any manga source selected", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
+                    mbox.ShowMessage(this, SelectedLanguage.NoSelectedSource, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                 }
             }
         }
@@ -496,7 +524,7 @@ namespace Mija_Reader
                         {
                             MetroMessageBox mbox = new MetroMessageBox();
                             mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
-                            mbox.ShowMessage(this, "Something went wrong while searching", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
+                            mbox.ShowMessage(this, SelectedLanguage.SomethingWentWrong, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                         }
                     }
                 }
@@ -587,7 +615,7 @@ namespace Mija_Reader
                         {
                             MetroMessageBox mbox = new MetroMessageBox();
                             mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
-                            mbox.ShowMessage(this, "Something went wrong while searching", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
+                            mbox.ShowMessage(this, SelectedLanguage.SomethingWentWrong, SelectedLanguage.Error, MessageBoxMessage.information, MessageBoxButton.OK);
                         }
                     }
                 }
@@ -673,7 +701,7 @@ namespace Mija_Reader
                 ObservableCollection<BaseMangaSource.MangaPageData> data = ((libraryChild.Content as ListView).ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
                 for(int i = 0; i < data.Count; i++)
                 {
-                    if(data.ElementAt(i).Name == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name)
+                    if(data.ElementAt(i).Name == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name && data.ElementAt(i).Website == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website)
                     {
                         foundMatch = true;
                         foundIn = libraryChild.Header.ToString();
@@ -685,7 +713,7 @@ namespace Mija_Reader
             {
                 MetroMessageBox mbox = new MetroMessageBox();
                 mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
-                mbox.ShowMessage(this, string.Format("Manga '" + SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name + "' is already exist in your library. You can Find it in '" + foundIn + "'.", "Error"), "Information", MessageBoxMessage.information, MessageBoxButton.OK);
+                mbox.ShowMessage(this, string.Format(SelectedLanguage.MangaAlreadyExist, SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name, foundIn ), SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
             }
             else
             {
@@ -699,8 +727,7 @@ namespace Mija_Reader
                     c_MainTabTC.SelectedIndex = 2;
                     c_LibraryTabTC.SelectedIndex = 0;
 
-                    //library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
-
+                    library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
                 }
             }
         }

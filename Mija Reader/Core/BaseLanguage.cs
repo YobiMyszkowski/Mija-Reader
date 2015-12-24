@@ -104,6 +104,66 @@ namespace Mija_Reader.Core
             get { return _Search; }
             set { _Search = value; RaisePropertyChanged("Search"); }
         }
+        private string _Information = "Information";
+        public string Information
+        {
+            get { return _Information; }
+            set { _Information = value; RaisePropertyChanged("Information"); }
+        }
+        private string _Warning = "Warning";
+        public string Warning
+        {
+            get { return _Warning; }
+            set { _Warning = value; RaisePropertyChanged("Warning"); }
+        }
+        private string _Error = "Error";
+        public string Error
+        {
+            get { return _Error; }
+            set { _Error = value; RaisePropertyChanged("Error"); }
+        }
+        private string _Yes = "Yes";
+        public string Yes
+        {
+            get { return _Yes; }
+            set { _Yes = value; RaisePropertyChanged("Yes"); }
+        }
+        private string _No = "No";
+        public string No
+        {
+            get { return _No; }
+            set { _No = value; RaisePropertyChanged("No"); }
+        }
+        private string _Cancel = "Cancel";
+        public string Cancel
+        {
+            get { return _Cancel; }
+            set { _Cancel = value; RaisePropertyChanged("Cancel"); }
+        }
+        private string _Ok = "Ok";
+        public string Ok
+        {
+            get { return _Ok; }
+            set { _Ok = value; RaisePropertyChanged("Ok"); }
+        }
+        private string _MangaAlreadyExist = "Manga {0} is already exist in your library. You can Find it in {1}";
+        public string MangaAlreadyExist
+        {
+            get { return _MangaAlreadyExist; }
+            set { _MangaAlreadyExist = value; RaisePropertyChanged("MangaAlreadyExist"); }
+        }
+        private string _SomethingWentWrong = "Something went wrong while searching.";
+        public string SomethingWentWrong
+        {
+            get { return _SomethingWentWrong; }
+            set { _SomethingWentWrong = value; RaisePropertyChanged("SomethingWentWrong"); }
+        }
+        private string _NoSelectedSource = "There isn't any manga source selected. If you can't select any, that mean you don't have any plugins instaled. Please reinstall program or add sources manually into proper folder.";
+        public string NoSelectedSource
+        {
+            get { return _NoSelectedSource; }
+            set { _NoSelectedSource = value; RaisePropertyChanged("NoSelectedSource"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
