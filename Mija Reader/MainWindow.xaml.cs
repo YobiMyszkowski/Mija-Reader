@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Reflection; //Assembly
 using DropNet;
 
+using Mija_Reader.AdditionalControls;
 
 namespace Mija_Reader
 {
@@ -19,6 +20,7 @@ namespace Mija_Reader
         DropNetClient _client = null;
         Core.Ini MyIni = null;
         BaseMangaSource.IPlugin parser;
+        MetroMessageBox mbox = new MetroMessageBox();
         private ObservableCollection<dynamic> _Languages = new ObservableCollection<dynamic>();
         public ObservableCollection<dynamic> Languages
         {
@@ -200,7 +202,6 @@ namespace Mija_Reader
             }
             #endregion
         }
-
         private void Browser_LoadCompleted(object sender, NavigationEventArgs e)
         {
             dynamic doc = (sender as WebBrowser).Document;
@@ -233,6 +234,7 @@ namespace Mija_Reader
                 });
             }
         }
+
         private BaseMangaSource.IPlugin LoadPluginByWebsite(string website)
         {
             Type ObjType = null;
@@ -336,22 +338,22 @@ namespace Mija_Reader
                             }
                             else
                             {
-                                //ShowMessage(_viewModel.Error, "Something went wrong while searching -.-", MessageBoxMessage.error);
-                                //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                                MetroMessageBox mbox = new MetroMessageBox();
+                                mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                                mbox.ShowMessage(this, "Something went wrong while searching", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         throw new Exception(ex.Message);
-                        //ShowMessage(_viewModel.Error, ex.Message, MessageBoxMessage.error);
-                        //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
                     }
                 }
                 else
                 {
-                    //ShowMessage(_viewModel.Information, _viewModel.SelectMangaSourceMessage, MessageBoxMessage.error);
-                    //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                    MetroMessageBox mbox = new MetroMessageBox();
+                    mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                    mbox.ShowMessage(this, "There isn't any manga source selected", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
                 }
             }
         }
@@ -433,15 +435,15 @@ namespace Mija_Reader
                         }
                         else
                         {
-                            //ShowMessage(_viewModel.Error, "Something went wrong while searching -.-", MessageBoxMessage.error);
-                            //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                            MetroMessageBox mbox = new MetroMessageBox();
+                            mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                            mbox.ShowMessage(this, "Something went wrong while searching", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    //ShowMessage(_viewModel.Error, ex.Message, MessageBoxMessage.error);
-                    //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                    throw new Exception(ex.Message);
                 }
             }
 
@@ -524,17 +526,17 @@ namespace Mija_Reader
                         }
                         else
                         {
-                            //ShowMessage(_viewModel.Error, "Something went wrong while searching -.-", MessageBoxMessage.error);
-                            //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                            MetroMessageBox mbox = new MetroMessageBox();
+                            mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                            mbox.ShowMessage(this, "Something went wrong while searching", "Error", MessageBoxMessage.information, MessageBoxButton.OK);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    //ShowMessage(_viewModel.Error, ex.Message, MessageBoxMessage.error);
-                    //MessageBoxBtnCancel.Click += (s, en) => { MessageBoxPanel.Visibility = Visibility.Collapsed; inactivityPanel.Visibility = Visibility.Collapsed; };
+                    throw new Exception(ex.Message);
                 }
             }
-            }
+        }
     }
 }
