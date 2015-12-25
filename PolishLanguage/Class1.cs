@@ -48,5 +48,8 @@
         public string ChaptersDirection { get { return "Wyświetlanie rozdziałów"; } }
         public string FromStartToEnd { get { return "Od początku do końca"; } }
         public string FromEndToStart { get { return "Od końca do początku"; } }
+        public string UploadSucces { get { return "Biblioteka została zuploadowana pomyślnie"; } }
+        public string DownloadSuccesAndReplaced { get { return "Biblioteka została pomyślnie pobrana i zastąpiła starą"; } }
+        public string UploadedFileIsSameAsOurs { get { return "Zuploadowana biblioteka jest taka sama jak zapisana na dysku"; } }
     }
 }

@@ -48,5 +48,8 @@
         public string ChaptersDirection { get { return "Chapters direction"; } }
         public string FromStartToEnd { get { return "From beginning to end"; } }
         public string FromEndToStart { get { return "From end to beginning"; } }
+        public string UploadSucces { get { return "Library was uploaded succesfully"; } }
+        public string DownloadSuccesAndReplaced { get { return "Library was downloaded succesfully and replaced ours"; } }
+        public string UploadedFileIsSameAsOurs { get { return "Uploaded library is same as one saved on drive"; } }
     }
 }

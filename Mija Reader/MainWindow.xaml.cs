@@ -293,51 +293,77 @@ namespace Mija_Reader
             }
             #endregion
 
-            #region InitializeDropBox
-            if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
+            #region Initialize Syncing library
+            loginAfterFirstRun:
+            if (MyIni.KeyExists("SyncSerwer", "WindowData"))
             {
-                (c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
-                for (int i = 1; i < c_MainTabTC.Items.Count; i++)
+                // dropbox.com
+                #region dropbox.com
+                if (MyIni.Read("SyncSerwer", "WindowData") == "www.dropbox.com")
                 {
-                    (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
-                }
-                c_MainTabTC.SelectedIndex = 1;
+                    loginServer.SelectedIndex = 0;
+                    if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
+                    {
+                        //(c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
+                        for (int i = 1; i < c_MainTabTC.Items.Count; i++)
+                        {
+                            (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
+                        }
+                        //c_MainTabTC.SelectedIndex = 1;
 
-                try
-                {
-                    _client = new DropNetClient(_apiKey, _appsecret);
+                        try
+                        {
+                            _client = new DropNetClient(_apiKey, _appsecret);
 
-                    _client.UserLogin = new DropNet.Models.UserLogin { Token = MyIni.Read("accessToken", "DropBox"), Secret = MyIni.Read("accessSecret", "DropBox") };
+                            _client.UserLogin = new DropNet.Models.UserLogin { Token = MyIni.Read("accessToken", "DropBox"), Secret = MyIni.Read("accessSecret", "DropBox") };
+
+                            loginSyncLibrary.IsEnabled = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        //(c_MainTabTC.Items[0] as TabItem).IsEnabled = true;
+                        for (int i = 1; i < c_MainTabTC.Items.Count; i++)
+                        {
+                            (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
+                        }
+                        //c_MainTabTC.SelectedIndex = 0;
+
+                        try
+                        {
+                            _client = new DropNetClient(_apiKey, _appsecret);
+                            // Sync
+                            _client.GetToken();
+
+                            var url = _client.BuildAuthorizeUrl();
+
+                            loginBrowser.Navigate(url);
+                            loginBrowser.LoadCompleted += Browser_DropBoxLoadCompleted;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(ex.Message);
+                        }
+                    }
                 }
-                catch (Exception ex)
+                #endregion
+                else if(MyIni.Read("SyncSerwer", "WindowData") == "www.googledrive.com")
                 {
-                    throw new Exception(ex.Message);
+                }
+                else
+                {
                 }
             }
             else
             {
-                (c_MainTabTC.Items[0] as TabItem).IsEnabled = true;
-                for (int i = 1; i < c_MainTabTC.Items.Count; i++)
-                {
-                    (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
-                }
-                c_MainTabTC.SelectedIndex = 0;
-
-                try
-                {
-                    _client = new DropNetClient(_apiKey, _appsecret);
-                    // Sync
-                    _client.GetToken();
-
-                    var url = _client.BuildAuthorizeUrl();
-
-                    loginBrowser.Navigate(url);
-                    loginBrowser.LoadCompleted += Browser_LoadCompleted;
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
+                // pick up default server to sync library 
+                loginServer.SelectedIndex = 0;
+                MyIni.Write("SyncSerwer", (loginServer.SelectedItem as ComboBoxItem).Content.ToString(), "WindowData");
+                goto loginAfterFirstRun;
             }
             #endregion
         }
@@ -346,7 +372,7 @@ namespace Mija_Reader
             base.OnClosed(e);
             Application.Current.Shutdown();
         }
-        private void Browser_LoadCompleted(object sender, NavigationEventArgs e)
+        private void Browser_DropBoxLoadCompleted(object sender, NavigationEventArgs e)
         {
             dynamic doc = (sender as WebBrowser).Document;
             var htmlText = doc.documentElement.OuterText;
@@ -363,12 +389,13 @@ namespace Mija_Reader
                         MyIni.Write("accessToken", accessToken.Token, "DropBox");
                         MyIni.Write("accessSecret", accessToken.Secret, "DropBox");
 
-                        (c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
+                        //(c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
                         for (int i = 1; i < c_MainTabTC.Items.Count; i++)
                         {
                             (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
                         }
-                        c_MainTabTC.SelectedIndex = 1;
+                        //c_MainTabTC.SelectedIndex = 1;
+                        loginSyncLibrary.IsEnabled = true;
                     }
                 },
                 (error) =>
@@ -377,7 +404,139 @@ namespace Mija_Reader
                 });
             }
         }
+        private void loginServer_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MyIni.Write("SyncSerwer", (loginServer.SelectedItem as ComboBoxItem).Content.ToString(), "WindowData");
+        }
+        private void loginSyncLibrary_Click(object sender, RoutedEventArgs e)
+        {
+            if (MyIni.KeyExists("SyncSerwer", "WindowData"))
+            {
+                // dropbox.com
+                #region dropbox.com
+                if (MyIni.Read("SyncSerwer", "WindowData") == "www.dropbox.com")
+                {
+                    _client.UseSandbox = true;
+                    _client.GetMetaDataAsync(library.Path.Substring(library.Path.IndexOf('\\') + 1),
+                    (metaData) =>
+                    {
+                        System.IO.FileStream info = System.IO.File.OpenRead(library.Path);
+                        if (metaData.Bytes == info.Length)
+                        {
+                               _client.GetFileAsync(library.Path.Substring(library.Path.IndexOf('\\') + 1),
+                               (response) =>
+                               {
+                                   if (response.RawBytes.SequenceEqual(System.IO.File.ReadAllBytes(library.Path)))
+                                   {
+                                       // file is same as 1 on disk
+                                       this.Dispatcher.BeginInvoke((Action)(() =>
+                                       {
+                                           MetroMessageBox mbox = new MetroMessageBox();
+                                           mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                                           mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
+                                           mbox.ShowMessage(this, SelectedLanguage.UploadedFileIsSameAsOurs, SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
+                                       }));
+                                   }
+                                   else
+                                   {
+                                       // file on serwer and disk is different in content but same size, upload ours
+                                       _client.UploadFileAsync("/", library.Path.Substring(library.Path.IndexOf('\\') + 1), System.IO.File.ReadAllBytes(library.Path),
+                                        (upresponse) =>
+                                        {
+                                            this.Dispatcher.BeginInvoke((Action)(() =>
+                                            {
+                                                MetroMessageBox mbox = new MetroMessageBox();
+                                                mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                                                mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
+                                                mbox.ShowMessage(this, SelectedLanguage.UploadSucces, SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
+                                            }));
+                                        },
+                                        (error) =>
+                                        {
+                                            throw new Exception(error.Message);
+                                        });
+                                   }
+                               },
+                            (error) =>
+                            {
+                                throw new Exception(error.Message);
+                            });                     
+                        }
+                        else if (metaData.Bytes > info.Length)
+                        {
+                            // server file is larger download it and replace ours 1 from disk
+                            _client.GetFileAsync(library.Path.Substring(library.Path.IndexOf('\\') + 1),
+                            (response) =>
+                            {
+                                this.Dispatcher.BeginInvoke((Action)(() =>
+                                {
+                                    System.IO.File.WriteAllBytes(library.Path, response.RawBytes);
+                                    #region load_Library
+                                    ReadingData.Clear();
+                                    FinishedData.Clear();
+                                    AbandonedData.Clear();
 
+                                    if (!library.IsFileExist())
+                                    {
+                                        if (!library.IsFolderExist())
+                                        {
+                                            library.CreateFolder();
+                                        }
+                                        library.Create();
+                                        library.Load();
+                                        library.LoadLibrary(ReadingData, FinishedData, AbandonedData);
+                                    }
+                                    else
+                                    {
+                                        library.Load();
+                                        library.LoadLibrary(ReadingData, FinishedData, AbandonedData);
+                                    }
+                                    #endregion
+                                    MetroMessageBox mbox = new MetroMessageBox();
+                                    mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                                    mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
+                                    mbox.ShowMessage(this, SelectedLanguage.DownloadSuccesAndReplaced, SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
+
+                                }));
+                            },
+                            (error) =>
+                            {
+                                throw new Exception(error.Message);
+                            });
+                        }
+                        else if (metaData.Bytes < info.Length)
+                        {
+                            // our file is larger upload it to server
+                            _client.UploadFileAsync("/", library.Path.Substring(library.Path.IndexOf('\\') + 1), System.IO.File.ReadAllBytes(library.Path),
+                            (response) =>
+                            {
+                                this.Dispatcher.BeginInvoke((Action)(() =>
+                                {
+                                    MetroMessageBox mbox = new MetroMessageBox();
+                                    mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                                    mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
+                                    mbox.ShowMessage(this, SelectedLanguage.UploadSucces, SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
+                                }));
+                            },
+                            (error) =>
+                            {
+                                throw new Exception(error.Message);
+                            });
+                        }
+                        else
+                        {
+                            // 
+                        }
+                        info.Close();
+                    },
+                    (error) =>
+                    {
+                        throw new Exception(error.Message);
+                    });
+                }
+                #endregion
+            }
+        }
         private BaseMangaSource.IPlugin LoadPluginByWebsite(string website)
         {
             Type ObjType = null;
@@ -452,6 +611,9 @@ namespace Mija_Reader
             SelectedLanguage.ChaptersDirection = c.ChaptersDirection;
             SelectedLanguage.FromStartToEnd = c.FromStartToEnd;
             SelectedLanguage.FromEndToStart = c.FromEndToStart;
+            SelectedLanguage.UploadSucces = c.UploadSucces;
+            SelectedLanguage.DownloadSuccesAndReplaced = c.DownloadSuccesAndReplaced;
+            SelectedLanguage.UploadedFileIsSameAsOurs = c.UploadedFileIsSameAsOurs;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }

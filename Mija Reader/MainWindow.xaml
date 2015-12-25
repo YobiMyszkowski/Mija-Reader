@@ -9,7 +9,23 @@
     <Grid>
         <TabControl x:Name="c_MainTabTC">
             <TabItem Header="{Binding SelectedLanguage.Login}">
-                <WebBrowser x:Name="loginBrowser"></WebBrowser>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                        <ComboBox x:Name="loginServer" SelectionChanged="loginServer_SelectionChanged">
+                            <ComboBoxItem Content="www.dropbox.com"></ComboBoxItem>
+                        </ComboBox>
+                        <Button x:Name="loginSyncLibrary" Content="Sync" Width="50" HorizontalAlignment="Right" IsEnabled="False" Click="loginSyncLibrary_Click"></Button>
+                    </StackPanel>
+                    <WebBrowser x:Name="loginBrowser" Grid.Row="1" Grid.ColumnSpan="2"></WebBrowser>
+                </Grid>
             </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Home}">
                 <Grid>
@@ -20,12 +36,12 @@
                     </Grid.ColumnDefinitions>
 
                     <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
-                        <ListView>
+                        <ListView SelectionMode="Single">
                             
                         </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
-                        <ListView>
+                        <ListView SelectionMode="Single">
                             
                         </ListView>
                     </GroupBox>
@@ -57,7 +73,7 @@
                                 </ComboBox>
                                 <AdditionalControls:SearchTextBox x:Name="tvSearchText" Watermark="searching quote" KeyUp="SearchTextBox_KeyUp"/>
                             </StackPanel>
-                            <ListView x:Name="tvSearchResults" Grid.Row="1" VerticalAlignment="Stretch" ItemsSource="{Binding SearchResultsData}" MouseDoubleClick="ListView_MouseDoubleClick">
+                            <ListView x:Name="tvSearchResults" Grid.Row="1" VerticalAlignment="Stretch" SelectionMode="Single" ItemsSource="{Binding SearchResultsData}" MouseDoubleClick="ListView_MouseDoubleClick">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Grid ToolTip="{Binding Name}" Width="100">
@@ -82,7 +98,7 @@
                                 </ListView.ItemsPanel>
                             </ListView>
                             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <Button x:Name="tvSearchPrev" Content="&lt;&lt;" IsEnabled="True" Click="tvSearchPrev_Click"></Button>
+                                <Button x:Name="tvSearchPrev" Content="&lt;&lt;" IsEnabled="False" Click="tvSearchPrev_Click"></Button>
                                 <Button x:Name="tvSearchNext" Content="&gt;&gt;" IsEnabled="False" Click="tvSearchNext_Click"></Button>
                             </StackPanel>
                         </Grid>
@@ -92,7 +108,7 @@
             <TabItem Header="{Binding SelectedLanguage.Library}">
                 <TabControl x:Name="c_LibraryTabTC">
                     <TabItem Header="{Binding SelectedLanguage.Reading}">
-                        <ListView ItemsSource="{Binding ReadingData}" ContextMenu="{DynamicResource MainCM}" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                        <ListView ItemsSource="{Binding ReadingData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
@@ -148,7 +164,7 @@
                         </ListView>
                     </TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Finished}">
-                        <ListView ItemsSource="{Binding FinishedData}" ContextMenu="{DynamicResource MainCM}" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                        <ListView ItemsSource="{Binding FinishedData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
@@ -204,7 +220,7 @@
                         </ListView>
                     </TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Abandoned}">
-                        <ListView ItemsSource="{Binding AbandonedData}" ContextMenu="{DynamicResource MainCM}" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                        <ListView ItemsSource="{Binding AbandonedData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
@@ -302,7 +318,7 @@
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                <GroupBox Grid.Column="0" Grid.Row="0" Header="{Binding SelectedLanguage.LanguageString}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <GroupBox Grid.Column="0" Grid.Row="0" Header="{Binding SelectedLanguage.LanguageString}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <ComboBox x:Name="c_LanguageCB" ItemsSource="{Binding Languages}"  SelectionChanged="c_LanguageCB_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>

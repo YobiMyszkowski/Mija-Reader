@@ -248,6 +248,24 @@ namespace Mija_Reader.Core
             get { return _FromEndToStart; }
             set { _FromEndToStart = value; RaisePropertyChanged("FromEndToStart"); }
         }
+        private string _UploadSucces = "Library was uploaded succesfully";
+        public string UploadSucces
+        {
+            get { return _UploadSucces; }
+            set { _UploadSucces = value; RaisePropertyChanged("UploadSucces"); }
+        }
+        private string _DownloadSuccesAndReplaced = "Library was downloaded succesfully and replaced old one";
+        public string DownloadSuccesAndReplaced
+        {
+            get { return _DownloadSuccesAndReplaced; }
+            set { _DownloadSuccesAndReplaced = value; RaisePropertyChanged("DownloadSuccesAndReplaced"); }
+        }
+        private string _UploadedFileIsSameAsOurs = "Uploaded library is same as one on disk";
+        public string UploadedFileIsSameAsOurs
+        {
+            get { return _UploadedFileIsSameAsOurs; }
+            set { _UploadedFileIsSameAsOurs = value; RaisePropertyChanged("UploadedFileIsSameAsOurs"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

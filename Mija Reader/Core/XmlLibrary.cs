@@ -879,6 +879,13 @@ namespace Mija_Reader.Core
                 return "";
             }
         }
+        public string Path
+        {
+            get
+            {
+                return name_;
+            }
+        }
     }
 }
 
