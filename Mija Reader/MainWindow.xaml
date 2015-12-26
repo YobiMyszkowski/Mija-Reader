@@ -109,7 +109,13 @@
             <TabItem Header="{Binding SelectedLanguage.Library}">
                 <TabControl x:Name="c_LibraryTabTC">
                     <TabItem Header="{Binding SelectedLanguage.Reading}">
-                        <ListView ItemsSource="{Binding ReadingData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                        <ListView ItemsSource="{Binding ReadingData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" 
+                                  MouseRightButtonUp="tvLibrary_MouseRightButtonUp"
+                                  AllowDrop="True"
+									DragEnter="ListViewDragEnter"
+									Drop="ListViewDrop"
+									PreviewMouseMove="ListViewPreviewMouseMove"
+									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
@@ -164,7 +170,13 @@
                         </ListView>
                     </TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Finished}">
-                        <ListView ItemsSource="{Binding FinishedData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                        <ListView ItemsSource="{Binding FinishedData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" 
+                                  MouseRightButtonUp="tvLibrary_MouseRightButtonUp"
+                                  AllowDrop="True"
+									DragEnter="ListViewDragEnter"
+									Drop="ListViewDrop"
+									PreviewMouseMove="ListViewPreviewMouseMove"
+									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
@@ -219,7 +231,13 @@
                         </ListView>
                     </TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Abandoned}">
-                        <ListView ItemsSource="{Binding AbandonedData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" MouseRightButtonUp="tvLibrary_MouseRightButtonUp">
+                        <ListView ItemsSource="{Binding AbandonedData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" 
+                                  MouseRightButtonUp="tvLibrary_MouseRightButtonUp"
+                                  AllowDrop="True"
+								    DragEnter="ListViewDragEnter"
+									Drop="ListViewDrop"
+									PreviewMouseMove="ListViewPreviewMouseMove"
+									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>

@@ -14,8 +14,9 @@ That gonna be my own <b>manga/manhwa/manhua reader</b>.
 <br><li>basic settings system (saving to .ini file)
 <br><li>view online (wait till first chapter finish laoding and all next wil be kept loading in background)
 <br><li>check for new chapters
+<br><li>drag and drop in library (atm only allow to move items in one library/moving items via drag and drop dont allow to move from one library to another)
 <br>
-<br>Hotkeys:
+<br><b>Hotkeys</b>:
 <br>
 <br><li>ctrl+add = zoom up; ctrl+subtract = zoom down; ctrl+space = reset zoom and panning; left mouse click and move (drag) = panning
 <br><li>arrows navigating in Reader: right = next page; left = previous page; down = scrool down; up = scrool up

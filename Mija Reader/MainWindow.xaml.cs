@@ -88,8 +88,11 @@ namespace Mija_Reader
 {
     public partial class MainWindow : Window
     {
+        #region Secrets
         private const string _apiKey = "1d17vae78l691bl";
         private const string _appsecret = "8gn5q15w1fy3gpm";
+        #endregion
+        #region Handles
         DropNetClient _client = null;
         Core.Ini MyIni = null;
         Core.XMLLibrary library = new Core.XMLLibrary(@"Data\MangaLibrary.xml");
@@ -161,14 +164,14 @@ namespace Mija_Reader
             get { return _NextReaderInfo; }
             set { _NextReaderInfo = value; }
         }
-
+        #endregion
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
 
             SourceInitialized += MainWindow_SourceInitialized;
-
+            #region Shortkuts
             PreviewKeyDown += (s, e) =>
             {
                 Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
@@ -243,6 +246,7 @@ namespace Mija_Reader
                     };
                 }
             };
+            #endregion
         }
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
@@ -615,37 +619,6 @@ namespace Mija_Reader
                 #endregion
             }
         }
-        private BaseMangaSource.IPlugin LoadPluginByWebsite(string website)
-        {
-            Type ObjType = null;
-            try
-            {
-                Assembly ass = null;
-                ass = Assembly.LoadFrom(Environment.CurrentDirectory.ToString() + @"\Data\MangaSources\" + website);
-                if (ass != null)
-                {
-                    ObjType = ass.GetType(@"MangaParser" + ".Parser");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            try
-            {
-                if (ObjType != null)
-                {
-                    parser = (BaseMangaSource.IPlugin)Activator.CreateInstance(ObjType);
-                    c_SearchCB.ToolTip = parser.Website + ", " + parser.Lang + ", " + parser.Author;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-            return parser;
-        }
         private void c_LanguageCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             dynamic c = Languages.ElementAt((sender as ComboBox).SelectedIndex);
@@ -701,6 +674,7 @@ namespace Mija_Reader
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
+        #region Search
         private void c_SearchCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             parser = SearchPluginData.ElementAt((sender as ComboBox).SelectedIndex);
@@ -951,6 +925,8 @@ namespace Mija_Reader
                 }
             }
         }
+        #endregion
+        #region Library
         MangaDetailsViewer details;
         private async void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -1226,6 +1202,8 @@ namespace Mija_Reader
                 }
             }
         }
+        #endregion
+        #region Chapters
         private async void MenuItem_Click_ShowChaptersLibrary(object sender, RoutedEventArgs e)
         {
             ChaptersInfo.Clear();
@@ -1498,96 +1476,8 @@ namespace Mija_Reader
                 MyIni.Write("ChapterDisplayDirection", "End", "WindowData");
             }
         }
-        public static bool IsEqual(Brush aBrush1, Brush aBrush2)
-        {
-            if (aBrush1.GetType() != aBrush2.GetType())
-                return false;
-            else
-            {
-                if (aBrush1 is SolidColorBrush)
-                {
-                    return (aBrush1 as SolidColorBrush).Color ==
-                      (aBrush2 as SolidColorBrush).Color &&
-                      (aBrush1 as SolidColorBrush).Opacity == (aBrush2 as SolidColorBrush).Opacity;
-                }
-                else if (aBrush1 is LinearGradientBrush)
-                {
-                    bool result = true;
-                    result = (aBrush1 as LinearGradientBrush).ColorInterpolationMode ==
-                      (aBrush2 as LinearGradientBrush).ColorInterpolationMode && result;
-                    result = (aBrush1 as LinearGradientBrush).EndPoint ==
-                      (aBrush2 as LinearGradientBrush).EndPoint && result;
-                    result = (aBrush1 as LinearGradientBrush).MappingMode ==
-                      (aBrush2 as LinearGradientBrush).MappingMode && result;
-                    result = (aBrush1 as LinearGradientBrush).Opacity ==
-                      (aBrush2 as LinearGradientBrush).Opacity && result;
-                    result = (aBrush1 as LinearGradientBrush).StartPoint ==
-                      (aBrush2 as LinearGradientBrush).StartPoint && result;
-                    result = (aBrush1 as LinearGradientBrush).SpreadMethod ==
-                      (aBrush2 as LinearGradientBrush).SpreadMethod && result;
-                    result = (aBrush1 as LinearGradientBrush).GradientStops.Count ==
-                      (aBrush2 as LinearGradientBrush).GradientStops.Count && result;
-                    if (result && (aBrush1 as LinearGradientBrush).GradientStops.Count ==
-                              (aBrush2 as LinearGradientBrush).GradientStops.Count)
-                    {
-                        for (int i = 0; i < (aBrush1 as LinearGradientBrush).GradientStops.Count; i++)
-                        {
-                            result = (aBrush1 as LinearGradientBrush).GradientStops[i].Color ==
-                              (aBrush2 as LinearGradientBrush).GradientStops[i].Color && result;
-                            result = (aBrush1 as LinearGradientBrush).GradientStops[i].Offset ==
-                              (aBrush2 as LinearGradientBrush).GradientStops[i].Offset && result;
-                            if (!result)
-                                return result;
-                        }
-                    }
-                    return result;
-                }
-                else if (aBrush1 is RadialGradientBrush)
-                {
-                    bool result = true;
-                    result = (aBrush1 as RadialGradientBrush).ColorInterpolationMode ==
-                                 (aBrush2 as RadialGradientBrush).ColorInterpolationMode && result;
-                    result = (aBrush1 as RadialGradientBrush).GradientOrigin ==
-                                (aBrush2 as RadialGradientBrush).GradientOrigin && result;
-                    result = (aBrush1 as RadialGradientBrush).MappingMode == (aBrush2 as RadialGradientBrush).MappingMode && result;
-                    result = (aBrush1 as RadialGradientBrush).Opacity == (aBrush2 as RadialGradientBrush).Opacity && result;
-                    result = (aBrush1 as RadialGradientBrush).RadiusX == (aBrush2 as RadialGradientBrush).RadiusX && result;
-                    result = (aBrush1 as RadialGradientBrush).RadiusY == (aBrush2 as RadialGradientBrush).RadiusY && result;
-                    result = (aBrush1 as RadialGradientBrush).SpreadMethod == (aBrush2 as RadialGradientBrush).SpreadMethod && result;
-                    result = (aBrush1 as RadialGradientBrush).GradientStops.Count == (aBrush2 as RadialGradientBrush).GradientStops.Count && result;
-                    if (result && (aBrush1 as RadialGradientBrush).GradientStops.Count == (aBrush2 as RadialGradientBrush).GradientStops.Count)
-                    {
-                        for (int i = 0; i < (aBrush1 as RadialGradientBrush).GradientStops.Count; i++)
-                        {
-                            result = (aBrush1 as RadialGradientBrush).GradientStops[i].Color ==
-                                          (aBrush2 as RadialGradientBrush).GradientStops[i].Color && result;
-                            result = (aBrush1 as RadialGradientBrush).GradientStops[i].Offset ==
-                                              (aBrush2 as RadialGradientBrush).GradientStops[i].Offset && result;
-                            if (!result)
-                                return result;
-                        }
-                    }
-                    return result;
-                }
-                else if (aBrush1 is ImageBrush)
-                {
-                    bool result = true;
-                    result = (aBrush1 as ImageBrush).AlignmentX == (aBrush2 as ImageBrush).AlignmentX && result;
-                    result = (aBrush1 as ImageBrush).AlignmentY == (aBrush2 as ImageBrush).AlignmentY && result;
-                    result = (aBrush1 as ImageBrush).Opacity == (aBrush2 as ImageBrush).Opacity && result;
-                    result = (aBrush1 as ImageBrush).Stretch == (aBrush2 as ImageBrush).Stretch && result;
-                    result = (aBrush1 as ImageBrush).TileMode == (aBrush2 as ImageBrush).TileMode && result;
-                    result = (aBrush1 as ImageBrush).Viewbox == (aBrush2 as ImageBrush).Viewbox && result;
-                    result = (aBrush1 as ImageBrush).ViewboxUnits == (aBrush2 as ImageBrush).ViewboxUnits && result;
-                    result = (aBrush1 as ImageBrush).Viewport == (aBrush2 as ImageBrush).Viewport && result;
-                    result = (aBrush1 as ImageBrush).ViewportUnits == (aBrush2 as ImageBrush).ViewportUnits && result;
-
-                    result = (aBrush1 as ImageBrush).ImageSource == (aBrush2 as ImageBrush).ImageSource && result;
-                    return result;
-                }
-            }
-            return false;
-        }
+        #endregion
+        #region Reader
         private List<BitmapImage> ImageList = new List<BitmapImage>();
         private List<BitmapImage> NextChapterImageList = new List<BitmapImage>();
         private async void LoadNextChapterIfExist()
@@ -2009,6 +1899,7 @@ namespace Mija_Reader
         {
             NextImage();
         }
+        #endregion
         private async void CheckForNewChapters()
         {
             if (ReadingData.Count > 0)
@@ -2067,5 +1958,281 @@ namespace Mija_Reader
             {
             }
         }
+        #region Drag/Drop item in library
+        private Point _startPoint;
+        private Core.DragAdorner _adorner;
+        private AdornerLayer _layer;
+        private bool _dragIsOutOfScope = false;
+        private ListView _dragListView;
+        private void ListViewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition(null);
+            _dragListView = (sender as ListView);
+        }
+        private void ListViewPreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point position = e.GetPosition(null);
+
+                if (Math.Abs(position.X - _startPoint.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                    Math.Abs(position.Y - _startPoint.Y) > SystemParameters.MinimumVerticalDragDistance)
+                {
+                    BeginDrag(e);
+                }
+            }
+        }
+        private void ListViewDragEnter(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent("myFormat") || sender == e.Source)
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
+        private void ListViewDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent("myFormat"))
+            {
+                BaseMangaSource.MangaPageData name = e.Data.GetData("myFormat") as BaseMangaSource.MangaPageData;
+                ListViewItem listViewItem = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
+
+                if (listViewItem != null)
+                {
+                    BaseMangaSource.MangaPageData nameToReplace = (sender as ListView).ItemContainerGenerator.ItemFromContainer(listViewItem) as BaseMangaSource.MangaPageData;
+                    int index = (sender as ListView).Items.IndexOf(nameToReplace);
+
+                    if (index >= 0 && name != null)
+                    {
+                        //update library
+                        library.MoveMangaToIndex(((sender as ListView).SelectedItem as BaseMangaSource.MangaPageData).Name,
+                            ((sender as ListView).SelectedItem as BaseMangaSource.MangaPageData).Website, (sender as ListView).Items.IndexOf((sender as ListView).SelectedItem), index);
+
+                        ((sender as ListView).ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>).Remove(name);
+                        ((sender as ListView).ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>).Insert(index, name);
+                    }
+                }
+                else
+                {
+                }
+            }
+        }
+        private void BeginDrag(MouseEventArgs e)
+        {
+            ListView listView = this._dragListView;
+            ListViewItem listViewItem = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
+
+            if (listViewItem == null)
+                return;
+            if (listView == null)
+                return;
+            if (listView.SelectedItem != null)
+            {
+                BaseMangaSource.MangaPageData name = listView.ItemContainerGenerator.ItemFromContainer(listViewItem) as BaseMangaSource.MangaPageData;
+
+                //setup the drag adorner.
+                InitialiseAdorner(listViewItem);
+
+                //add handles to update the adorner.
+                listView.PreviewDragOver += ListViewDragOver;
+                listView.DragLeave += ListViewDragLeave;
+                listView.DragEnter += ListViewDragEnter;
+
+                DataObject data = new DataObject("myFormat", name);
+                DragDropEffects de = DragDrop.DoDragDrop(this._dragListView, data, DragDropEffects.Move);
+
+                //cleanup
+                listView.PreviewDragOver -= ListViewDragOver;
+                listView.DragLeave -= ListViewDragLeave;
+                listView.DragEnter -= ListViewDragEnter;
+
+                if (_adorner != null)
+                {
+                    AdornerLayer.GetAdornerLayer(listView).Remove(_adorner);
+                    _adorner = null;
+                }
+            }
+        }
+        private void InitialiseAdorner(ListViewItem listViewItem)
+        {
+            VisualBrush brush = new VisualBrush(listViewItem);
+            _adorner = new Core.DragAdorner((UIElement)listViewItem, listViewItem.RenderSize, brush);
+            _adorner.Opacity = 0.5;
+            _layer = AdornerLayer.GetAdornerLayer(_dragListView as Visual);
+            _layer.Add(_adorner);
+        }
+        private void ListViewQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+        {
+            if (this._dragIsOutOfScope)
+            {
+                e.Action = DragAction.Cancel;
+                e.Handled = true;
+            }
+        }
+        private void ListViewDragLeave(object sender, DragEventArgs e)
+        {
+            if (e.OriginalSource == (sender as ListView))
+            {
+                Point point = e.GetPosition((sender as ListView));
+                Rect rect = VisualTreeHelper.GetContentBounds((sender as ListView));
+
+                //Check if within range of list view.
+                if (!rect.Contains(point))
+                {
+                    this._dragIsOutOfScope = true;
+                    e.Handled = true;
+                }
+            }
+        }
+        void ListViewDragOver(object sender, DragEventArgs args)
+        {
+            if (_adorner != null)
+            {
+                if ((sender as ListView).SelectedItem != null)
+                {
+                    Point position = args.GetPosition(this);
+
+                    _adorner.OffsetLeft = position.X - _startPoint.X;
+                    _adorner.OffsetTop = position.Y - _startPoint.Y;
+                }
+            }
+        }
+        private static T FindAnchestor<T>(DependencyObject current)
+    where T : DependencyObject
+        {
+            do
+            {
+                if (current is T)
+                {
+                    return (T)current;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
+        }
+        #endregion
+        #region Helpers
+        public static bool IsEqual(Brush aBrush1, Brush aBrush2)
+        {
+            if (aBrush1.GetType() != aBrush2.GetType())
+                return false;
+            else
+            {
+                if (aBrush1 is SolidColorBrush)
+                {
+                    return (aBrush1 as SolidColorBrush).Color ==
+                      (aBrush2 as SolidColorBrush).Color &&
+                      (aBrush1 as SolidColorBrush).Opacity == (aBrush2 as SolidColorBrush).Opacity;
+                }
+                else if (aBrush1 is LinearGradientBrush)
+                {
+                    bool result = true;
+                    result = (aBrush1 as LinearGradientBrush).ColorInterpolationMode ==
+                      (aBrush2 as LinearGradientBrush).ColorInterpolationMode && result;
+                    result = (aBrush1 as LinearGradientBrush).EndPoint ==
+                      (aBrush2 as LinearGradientBrush).EndPoint && result;
+                    result = (aBrush1 as LinearGradientBrush).MappingMode ==
+                      (aBrush2 as LinearGradientBrush).MappingMode && result;
+                    result = (aBrush1 as LinearGradientBrush).Opacity ==
+                      (aBrush2 as LinearGradientBrush).Opacity && result;
+                    result = (aBrush1 as LinearGradientBrush).StartPoint ==
+                      (aBrush2 as LinearGradientBrush).StartPoint && result;
+                    result = (aBrush1 as LinearGradientBrush).SpreadMethod ==
+                      (aBrush2 as LinearGradientBrush).SpreadMethod && result;
+                    result = (aBrush1 as LinearGradientBrush).GradientStops.Count ==
+                      (aBrush2 as LinearGradientBrush).GradientStops.Count && result;
+                    if (result && (aBrush1 as LinearGradientBrush).GradientStops.Count ==
+                              (aBrush2 as LinearGradientBrush).GradientStops.Count)
+                    {
+                        for (int i = 0; i < (aBrush1 as LinearGradientBrush).GradientStops.Count; i++)
+                        {
+                            result = (aBrush1 as LinearGradientBrush).GradientStops[i].Color ==
+                              (aBrush2 as LinearGradientBrush).GradientStops[i].Color && result;
+                            result = (aBrush1 as LinearGradientBrush).GradientStops[i].Offset ==
+                              (aBrush2 as LinearGradientBrush).GradientStops[i].Offset && result;
+                            if (!result)
+                                return result;
+                        }
+                    }
+                    return result;
+                }
+                else if (aBrush1 is RadialGradientBrush)
+                {
+                    bool result = true;
+                    result = (aBrush1 as RadialGradientBrush).ColorInterpolationMode ==
+                                 (aBrush2 as RadialGradientBrush).ColorInterpolationMode && result;
+                    result = (aBrush1 as RadialGradientBrush).GradientOrigin ==
+                                (aBrush2 as RadialGradientBrush).GradientOrigin && result;
+                    result = (aBrush1 as RadialGradientBrush).MappingMode == (aBrush2 as RadialGradientBrush).MappingMode && result;
+                    result = (aBrush1 as RadialGradientBrush).Opacity == (aBrush2 as RadialGradientBrush).Opacity && result;
+                    result = (aBrush1 as RadialGradientBrush).RadiusX == (aBrush2 as RadialGradientBrush).RadiusX && result;
+                    result = (aBrush1 as RadialGradientBrush).RadiusY == (aBrush2 as RadialGradientBrush).RadiusY && result;
+                    result = (aBrush1 as RadialGradientBrush).SpreadMethod == (aBrush2 as RadialGradientBrush).SpreadMethod && result;
+                    result = (aBrush1 as RadialGradientBrush).GradientStops.Count == (aBrush2 as RadialGradientBrush).GradientStops.Count && result;
+                    if (result && (aBrush1 as RadialGradientBrush).GradientStops.Count == (aBrush2 as RadialGradientBrush).GradientStops.Count)
+                    {
+                        for (int i = 0; i < (aBrush1 as RadialGradientBrush).GradientStops.Count; i++)
+                        {
+                            result = (aBrush1 as RadialGradientBrush).GradientStops[i].Color ==
+                                          (aBrush2 as RadialGradientBrush).GradientStops[i].Color && result;
+                            result = (aBrush1 as RadialGradientBrush).GradientStops[i].Offset ==
+                                              (aBrush2 as RadialGradientBrush).GradientStops[i].Offset && result;
+                            if (!result)
+                                return result;
+                        }
+                    }
+                    return result;
+                }
+                else if (aBrush1 is ImageBrush)
+                {
+                    bool result = true;
+                    result = (aBrush1 as ImageBrush).AlignmentX == (aBrush2 as ImageBrush).AlignmentX && result;
+                    result = (aBrush1 as ImageBrush).AlignmentY == (aBrush2 as ImageBrush).AlignmentY && result;
+                    result = (aBrush1 as ImageBrush).Opacity == (aBrush2 as ImageBrush).Opacity && result;
+                    result = (aBrush1 as ImageBrush).Stretch == (aBrush2 as ImageBrush).Stretch && result;
+                    result = (aBrush1 as ImageBrush).TileMode == (aBrush2 as ImageBrush).TileMode && result;
+                    result = (aBrush1 as ImageBrush).Viewbox == (aBrush2 as ImageBrush).Viewbox && result;
+                    result = (aBrush1 as ImageBrush).ViewboxUnits == (aBrush2 as ImageBrush).ViewboxUnits && result;
+                    result = (aBrush1 as ImageBrush).Viewport == (aBrush2 as ImageBrush).Viewport && result;
+                    result = (aBrush1 as ImageBrush).ViewportUnits == (aBrush2 as ImageBrush).ViewportUnits && result;
+
+                    result = (aBrush1 as ImageBrush).ImageSource == (aBrush2 as ImageBrush).ImageSource && result;
+                    return result;
+                }
+            }
+            return false;
+        }
+        private BaseMangaSource.IPlugin LoadPluginByWebsite(string website)
+        {
+            Type ObjType = null;
+            try
+            {
+                Assembly ass = null;
+                ass = Assembly.LoadFrom(Environment.CurrentDirectory.ToString() + @"\Data\MangaSources\" + website);
+                if (ass != null)
+                {
+                    ObjType = ass.GetType(@"MangaParser" + ".Parser");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            try
+            {
+                if (ObjType != null)
+                {
+                    parser = (BaseMangaSource.IPlugin)Activator.CreateInstance(ObjType);
+                    c_SearchCB.ToolTip = parser.Website + ", " + parser.Lang + ", " + parser.Author;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return parser;
+        }
+        #endregion
     }
 }
