@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Navigation;
 using System.Windows.Media.Imaging;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using DropNet;
 using System.Collections.Generic;
 using Mija_Reader.AdditionalControls;
@@ -148,12 +149,66 @@ namespace Mija_Reader
             get { return _SelectedLanguage; }
             set { _SelectedLanguage = value; }
         }
+        private ObservableCollection<BaseMangaSource.MangaImagesData> _ReaderInfo = new ObservableCollection<BaseMangaSource.MangaImagesData>();
+        public ObservableCollection<BaseMangaSource.MangaImagesData> ReaderInfo
+        {
+            get { return _ReaderInfo; }
+            set { _ReaderInfo = value; }
+        }
+        private ObservableCollection<BaseMangaSource.MangaImagesData> _NextReaderInfo = new ObservableCollection<BaseMangaSource.MangaImagesData>();
+        public ObservableCollection<BaseMangaSource.MangaImagesData> NextReaderInfo
+        {
+            get { return _NextReaderInfo; }
+            set { _NextReaderInfo = value; }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
 
             SourceInitialized += MainWindow_SourceInitialized;
+
+            PreviewKeyDown += (s, e) =>
+            {
+                Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
+                if (key.Equals(Key.Right))
+                {
+                    if ((c_MainTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Reader)
+                    {
+                        ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+                        MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem;
+                        if(nextmenu.IsEnabled)
+                            NextImage();
+                    }
+                }
+                if (key.Equals(Key.Left))
+                {
+                    if ((c_MainTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Reader)
+                    {
+                        ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+                        MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                        if (prevmenu.IsEnabled)
+                            PrevImage();
+                    }
+                }
+                if (key.Equals(Key.Down))
+                {
+                    if ((c_MainTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Reader)
+                    {
+                        if (!tvImageScrool.IsFocused)
+                            tvImageScrool.ScrollToVerticalOffset(tvImageScrool.VerticalOffset + 10);
+                    }
+                }
+                if (key.Equals(Key.Up))
+                {
+                    if ((c_MainTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Reader)
+                    {
+                        if (!tvImageScrool.IsFocused)
+                            tvImageScrool.ScrollToVerticalOffset(tvImageScrool.VerticalOffset - 10);
+                    }
+                }
+            };
         }
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
@@ -614,6 +669,10 @@ namespace Mija_Reader
             SelectedLanguage.UploadSucces = c.UploadSucces;
             SelectedLanguage.DownloadSuccesAndReplaced = c.DownloadSuccesAndReplaced;
             SelectedLanguage.UploadedFileIsSameAsOurs = c.UploadedFileIsSameAsOurs;
+            SelectedLanguage.LoadingImagesMessage = c.LoadingImagesMessage;
+            SelectedLanguage.ClosePage = c.ClosePage;
+            SelectedLanguage.PrevImage = c.PrevImage;
+            SelectedLanguage.NextImage = c.NextImage;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
@@ -1222,10 +1281,6 @@ namespace Mija_Reader
                 }
             }
         }
-        private void MenuItem_Click_ViewOnline(object sender, RoutedEventArgs e)
-        {
-
-        }
         private void MenuItem_Click_MarkAsRead(object sender, RoutedEventArgs e)
         {
             IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
@@ -1507,6 +1562,429 @@ namespace Mija_Reader
                 }
             }
             return false;
+        }
+        private List<BitmapImage> ImageList = new List<BitmapImage>();
+        private List<BitmapImage> NextChapterImageList = new List<BitmapImage>();
+        private async void LoadNextChapterIfExist()
+        {
+            BaseMangaSource.MangaPageChapters item = null;
+            string ChapterDisplayDirection = null;
+            if (MyIni.KeyExists("ChapterDisplayDirection", "WindowData") == true)
+            {
+                ChapterDisplayDirection = MyIni.Read("ChapterDisplayDirection", "WindowData");
+            }
+            else
+            {
+                ChapterDisplayDirection = "Start";
+            }
+
+            if (ChapterDisplayDirection == "Start")
+            {
+                if (ChaptersInfo.IndexOf(tvChaptersList.SelectedItem as BaseMangaSource.MangaPageChapters) < ChaptersInfo.Count - 1)
+                {
+                    item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex + 1);
+                }
+                else
+                {
+                    NextChapterImageList.Clear();
+                    return;
+                }
+            }
+            else
+            {
+                if (((ChaptersInfo.Count - 1) - tvChaptersList.SelectedIndex) < ChaptersInfo.Count - 1)
+                {
+                    item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex - 1);
+                }
+                else 
+                {
+                    NextChapterImageList.Clear();
+                    return;
+                }
+            }
+            if (item != null)
+            {
+                NextChapterImageList.Clear();
+                NextReaderInfo.Clear();
+                bool result = await parser.ParseImagesAsync(item.UrlToPage, NextReaderInfo);
+
+                if (result == true)
+                {
+                    string nextLink = null;
+
+                    nextLink = null;
+
+                    NextChapterImageList.Add(new BitmapImage(new Uri(NextReaderInfo.Last().ImageLink)));
+
+                    for (int i = 0; i < NextReaderInfo.Last().MaxPages; i++)
+                    {
+                        nextLink = NextReaderInfo.Last().NextLink;
+
+                        if (nextLink != null)
+                        {
+                            result = await parser.ParseImagesAsync(nextLink, NextReaderInfo);
+                            if (NextReaderInfo.Last().ImageLink != "")
+                                NextChapterImageList.Add(new BitmapImage(new Uri(NextReaderInfo.Last().ImageLink)));
+                            else
+                                NextChapterImageList.Add(new BitmapImage());
+                        }
+                        else
+                        {
+                        }
+                    }
+                }
+            }
+        }
+        private async void MenuItem_Click_ViewOnline(object sender, RoutedEventArgs e)
+        {
+            BaseMangaSource.MangaPageChapters item = null;
+            if (tvChaptersList.SelectedItem != null)
+                item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
+
+            if (item != null)
+            {
+                tvImageView.Source = null;
+                ImageList.Clear();
+                NextChapterImageList.Clear();
+                ReaderInfo.Clear();
+
+                bool result = await parser.ParseImagesAsync(item.UrlToPage, ReaderInfo);
+
+                if (result == true)
+                {
+                    SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", item.Name, ReaderInfo.Last().PageNumber, ReaderInfo.Last().MaxPages);
+
+                    tvImageScrool.ScrollToTop();
+
+                    tvLoadingProgress.Visibility = Visibility.Visible;
+                    tvLoadingText.Visibility = Visibility.Visible;
+                    tvLoadingProgress.Minimum = 1;
+                    tvLoadingProgress.Maximum = ReaderInfo.Last().MaxPages;
+
+                    for (int i = 0; i < c_MainTabTC.Items.Count; i++)
+                    {
+                        (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
+                    }
+                    (c_MainTabTC.Items[4] as TabItem).IsEnabled = true;
+                    c_MainTabTC.SelectedIndex = 4;
+
+                    string nextLink = null;
+
+                    ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
+
+                    for (int i = 0; i < ReaderInfo.Last().MaxPages; i++)
+                    {
+                        tvLoadingProgress.Value = i;
+                        nextLink = ReaderInfo.Last().NextLink;
+                        if (nextLink != null)
+                        {
+                            result = await parser.ParseImagesAsync(nextLink, ReaderInfo);
+                            if (ReaderInfo.Last().ImageLink != "")
+                                ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
+                            else
+                                ImageList.Add(new BitmapImage());
+                        }
+                        else
+                        {
+                            tvLoadingProgress.Visibility = Visibility.Collapsed;
+                            tvLoadingText.Visibility = Visibility.Collapsed;
+                            tvLoadingProgress.Value = 1;
+                            tvImageView.Source = ImageList[0];
+                            tvImageScrool.ScrollToTop();
+                            tvImageList.SelectedIndex = 0;              
+                            tvLoadingProgress.Visibility = Visibility.Collapsed;
+
+                            ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+                            MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
+                            nextmenu.IsEnabled = true;
+
+                            LoadNextChapterIfExist();
+
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                }
+            }
+        }
+        private void tvImageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            tvImageScrool.ScrollToTop();
+            if ((sender as ListView).SelectedItem != null)
+            {
+                tvImageView.Source = ImageList[(sender as ListView).SelectedIndex];
+
+                SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex).Name, (sender as ListView).SelectedIndex + 1, ReaderInfo.Last().MaxPages);
+
+                if ((sender as ListView).SelectedIndex == 0)
+                {
+                    ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+                    MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                    prevmenu.IsEnabled = false;
+                }
+                else
+                {
+                    ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+                    MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                    prevmenu.IsEnabled = true;
+                }
+            }
+        }
+        private void NextImage()
+        {
+            ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+            int maxPages = tvImageList.Items.Count - 1;
+            int currentPage = tvImageList.SelectedIndex;
+
+            if (currentPage == maxPages)
+            {
+                if (NextChapterImageList.Count > 0 && NextChapterImageList != null)
+                {
+                    ReaderInfo.Clear();
+                    ImageList.Clear();
+                    ImageList = NextChapterImageList.ToList();
+                    try
+                    {
+                        foreach (BaseMangaSource.MangaImagesData imageData in NextReaderInfo)
+                        {
+                            ReaderInfo.Add(imageData);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.Message);
+                    }
+                    finally
+                    {
+                        tvImageView.Source = ImageList[0];
+                        tvImageScrool.ScrollToTop();
+
+                        NextReaderInfo.Clear();
+                        NextChapterImageList.Clear();
+                        
+                        maxPages = tvImageList.Items.Count;
+
+                        MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem; // prev
+                        prevmenu.IsEnabled = false;
+                        MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
+                        nextmenu.IsEnabled = true;
+
+                        tvImageList.SelectedIndex = 0;
+
+                        BaseMangaSource.MangaPageData item = null;
+                        IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+                        ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+                        if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+                        {
+                            item = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+                        }
+
+                        if (item != null)
+                        {
+                            BaseMangaSource.MangaPageChapters itm = null;
+
+                            if (tvChaptersList.SelectedItem != null)
+                                itm = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
+
+                            SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", itm.Name, 1, ReaderInfo.Last().MaxPages);
+
+                            if (itm != null)
+                            {
+                                if (IsEqual(itm.Foreground, Brushes.Gray))
+                                {
+                                }
+                                else
+                                {
+                                    itm.Foreground = Brushes.Gray;
+                                    if (library.IsChapterExistInManga(item.Name, item.Website, itm.Name, itm.UrlToPage))
+                                    {
+                                        library.MarkChapter(item.Name, item.Website, itm.Name, itm.UrlToPage, true);
+                                        int getUnreadChapters = item.UnreadChapters;
+                                        if (getUnreadChapters > 0)
+                                        {
+                                            library.ChangeUnreadChapters(item.Name, item.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                            item.UnreadChapters = getUnreadChapters - 1;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        library.AddChapterToManga(item.Name, item.Website, itm.Name, itm.UrlToPage, true);
+                                        int getUnreadChapters = item.UnreadChapters;
+                                        if (getUnreadChapters > 0)
+                                        {
+                                            library.ChangeUnreadChapters(item.Name, item.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                            item.UnreadChapters = getUnreadChapters - 1;
+                                        }
+                                    }
+                                    library.Save();
+                                }
+                            }
+                        }
+
+                        string ChapterDisplayDirection = null;
+                        if (MyIni.KeyExists("ChapterDisplayDirection", "WindowData") == true)
+                        {
+                            ChapterDisplayDirection = MyIni.Read("ChapterDisplayDirection", "WindowData");
+                        }
+                        else
+                        {
+                            ChapterDisplayDirection = "Start";
+                        }
+
+                        if (ChapterDisplayDirection == "Start")
+                        {
+                            tvChaptersList.SelectedIndex += 1;
+                        }
+                        else
+                        {
+                            if (((ChaptersInfo.Count - 1) - tvChaptersList.SelectedIndex) < ChaptersInfo.Count - 1)
+                            {
+                                tvChaptersList.SelectedIndex -= 1;
+                            }
+                            else 
+                            {
+                            }
+                        }
+                        LoadNextChapterIfExist();
+                    }
+                }
+                else
+                {
+                    BaseMangaSource.MangaPageData item = null;
+                    IEnumerable<ListView> selectedListView = (c_LibraryTabTC.SelectedItem as TabItem).FindChildren<ListView>();
+                    ObservableCollection<BaseMangaSource.MangaPageData> data = (selectedListView.FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+                    if (selectedListView.FirstOrDefault().SelectedIndex != -1)
+                    {
+                        item = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+                        SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", item.Name, 1, ReaderInfo.Last().MaxPages);
+                    }
+
+                    if (item != null)
+                    {
+                        BaseMangaSource.MangaPageChapters itm = null;
+
+                        if (tvChaptersList.SelectedItem != null)
+                            itm = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
+
+                        if (itm != null)
+                        {
+                            if (IsEqual(itm.Foreground, Brushes.Gray))
+                            {
+                            }
+                            else
+                            {
+                                itm.Foreground = Brushes.Gray;
+                                if (library.IsChapterExistInManga(item.Name, item.Website, itm.Name, itm.UrlToPage))
+                                {
+                                    library.MarkChapter(item.Name, item.Website, itm.Name, itm.UrlToPage, true);
+                                    int getUnreadChapters = item.UnreadChapters;
+                                    if (getUnreadChapters > 0)
+                                    {
+                                        library.ChangeUnreadChapters(item.Name, item.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                        item.UnreadChapters = getUnreadChapters - 1;
+                                    }
+                                }
+                                else
+                                {
+                                    library.AddChapterToManga(item.Name, item.Website, itm.Name, itm.UrlToPage, true);
+                                    int getUnreadChapters = item.UnreadChapters;
+                                    if (getUnreadChapters > 0)
+                                    {
+                                        library.ChangeUnreadChapters(item.Name, item.Website, string.Format("{0}", (getUnreadChapters - 1)));
+                                        item.UnreadChapters = getUnreadChapters - 1;
+                                    }
+                                }
+                                library.Save();
+                            }
+                        }
+                    }
+
+                    MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                    prevmenu.IsEnabled = false;
+                    MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
+                    nextmenu.IsEnabled = false;
+
+                    tvImageView.Source = null;
+                    
+                    SelectedLanguage.WindowTitle = "";
+
+                    ReaderInfo.Clear();
+                    ImageList.Clear();
+
+                    for (int i = 0; i < c_MainTabTC.Items.Count; i++)
+                    {
+                        (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
+                    }
+                    c_MainTabTC.SelectedIndex = 3;
+                }
+            }
+            else
+            {
+                MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                prevmenu.IsEnabled = true;
+                MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
+                nextmenu.IsEnabled = true;
+                currentPage += 1;
+                tvImageList.SelectedIndex = currentPage;
+            }
+        }
+        private void PrevImage()
+        {
+            ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+            int currentPage = tvImageList.SelectedIndex;
+            if (currentPage == 0)
+            {
+                MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                prevmenu.IsEnabled = false;
+            }
+            else
+            {
+                MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                prevmenu.IsEnabled = true;
+                currentPage -= 1;
+                tvImageList.SelectedIndex = currentPage;
+                if (currentPage == 0)
+                {
+                    prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                    prevmenu.IsEnabled = false;
+                }
+            }
+        }
+        private void MenuItem_Click_ClosePage(object sender, RoutedEventArgs e)
+        {
+            tvImageView.Source = null;
+
+            ReaderInfo.Clear();
+            NextReaderInfo.Clear();
+            tvImageList.Visibility = Visibility.Collapsed;
+
+            ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+            MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem; // prev
+            prevmenu.IsEnabled = false;
+            MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
+            nextmenu.IsEnabled = false;
+
+            for (int i = 0; i < c_MainTabTC.Items.Count; i++)
+            {
+                (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
+            }
+
+            c_MainTabTC.SelectedIndex = 3;
+
+            SelectedLanguage.WindowTitle = "";
+
+            ImageList.Clear();
+            NextChapterImageList.Clear();
+        }
+        private void MenuItem_Click_PrevPage(object sender, RoutedEventArgs e)
+        {
+            PrevImage();
+        }
+        private void MenuItem_Click_NextPage(object sender, RoutedEventArgs e)
+        {
+            NextImage();
         }
     }
 }

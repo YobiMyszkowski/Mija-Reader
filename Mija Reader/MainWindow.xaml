@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Mija_Reader"
         xmlns:additionalControls="clr-namespace:Mija_Reader.AdditionalControls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="{Binding SelectedLanguage.WindowTitle}" Height="350" Width="525">
     <Grid>
         <TabControl x:Name="c_MainTabTC">
             <TabItem Header="{Binding SelectedLanguage.Login}">
@@ -158,7 +158,6 @@
                                 <ItemsPanelTemplate>
                                     <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
 												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
-												MinWidth="{Binding ItemWidth, RelativeSource={RelativeSource Self}}"
 												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
@@ -214,7 +213,6 @@
                                 <ItemsPanelTemplate>
                                     <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
 												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
-												MinWidth="{Binding ItemWidth, RelativeSource={RelativeSource Self}}"
 												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
@@ -270,7 +268,6 @@
                                 <ItemsPanelTemplate>
                                     <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
 												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
-												MinWidth="{Binding ItemWidth, RelativeSource={RelativeSource Self}}"
 												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
@@ -288,7 +285,6 @@
                             <MenuItem Header="{Binding SelectedLanguage.MarkAllPreviousAsRead}" Click="MenuItem_Click_MarkAllPreviousAsRead"/>
                         </ContextMenu>
                     </ListView.Resources>
-
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid ToolTip="{Binding UrlToPage}">
@@ -300,7 +296,6 @@
                                 </Grid.RowDefinitions>
                                 <!-- fill grid background-->
                                 <TextBlock Text="{Binding Name}" Foreground="{Binding Foreground}" Grid.Row="0" Grid.Column="0"/>
-
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -318,16 +313,50 @@
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ScrollViewer x:Name="tvImageScrool" Grid.ColumnSpan="2" Grid.RowSpan="3">
-                        <additionalControls:ZoomPanel>
+                        <additionalControls:ZoomPanel ClipToBounds="True">
                             <Image x:Name="tvImageView" RenderTransformOrigin="0.5, 0.5" ContextMenu="{DynamicResource MainCM}">
                                 <Image.Resources>
                                     <ContextMenu x:Key ="MainCM">
-
+                                        <MenuItem Header="{Binding SelectedLanguage.ClosePage}" Click="MenuItem_Click_ClosePage"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.PrevImage}" IsEnabled="false" Click="MenuItem_Click_PrevPage"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.NextImage}" IsEnabled="false" Click="MenuItem_Click_NextPage"/>
                                     </ContextMenu>
                                 </Image.Resources>
                             </Image>
                         </additionalControls:ZoomPanel>
                     </ScrollViewer>
+                    <StackPanel Grid.RowSpan="3" Grid.ColumnSpan="2" VerticalAlignment="Center" Background="Transparent">
+                        <TextBlock x:Name="tvLoadingText" Text="{Binding SelectedLanguage.LoadingImagesMessage}" Background="Transparent" HorizontalAlignment="Center" Visibility="Collapsed" Foreground="Black"/>
+                        <ProgressBar x:Name="tvLoadingProgress" Background="Transparent" Visibility="Collapsed" Height="10"/>
+                    </StackPanel>
+                    <ListView Grid.ColumnSpan="2" Grid.Row="2" x:Name="tvImageList" Background="Black" Visibility="Collapsed" VerticalAlignment="Bottom" Margin="0,0,0,21" SelectionMode="Single" 
+								ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionChanged="tvImageList_SelectionChanged" ContextMenu="{DynamicResource MainCM}"
+								ItemsSource="{Binding ReaderInfo}">
+                        <ListView.Resources>
+                            <ContextMenu x:Key ="MainCM">
+                                <MenuItem Header="{Binding SelectedLanguage.RefreshImage}"/>
+                            </ContextMenu>
+                        </ListView.Resources>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <!-- fill grid background-->
+                                    <Image Grid.Row="0" Grid.Column="0" Width="100" Source="{Binding ImageLink, Converter={StaticResource StringToImageSourceValueConverter}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                    </ListView>
                 </Grid>
             </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Settings}">

@@ -266,6 +266,36 @@ namespace Mija_Reader.Core
             get { return _UploadedFileIsSameAsOurs; }
             set { _UploadedFileIsSameAsOurs = value; RaisePropertyChanged("UploadedFileIsSameAsOurs"); }
         }
+        private string _LoadingImagesMessage = "Please wait till all images finish loading";
+        public string LoadingImagesMessage
+        {
+            get { return _LoadingImagesMessage; }
+            set { _LoadingImagesMessage = value; RaisePropertyChanged("LoadingImagesMessage"); }
+        }
+        private string _WindowTitle = "";
+        public string WindowTitle
+        {
+            get { return _WindowTitle; }
+            set { _WindowTitle = value; RaisePropertyChanged("WindowTitle"); }
+        }
+        private string _ClosePage = "Close";
+        public string ClosePage
+        {
+            get { return _ClosePage; }
+            set { _ClosePage = value; RaisePropertyChanged("ClosePage"); }
+        }
+        private string _NextImage = "Next image";
+        public string NextImage
+        {
+            get { return _NextImage; }
+            set { _NextImage = value; RaisePropertyChanged("NextImage"); }
+        }
+        private string _PrevImage = "Prev image";
+        public string PrevImage
+        {
+            get { return _PrevImage; }
+            set { _PrevImage = value; RaisePropertyChanged("PrevImage"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

@@ -26,7 +26,7 @@
            Text="{Binding ElementName=Root, Path=Watermark}"
            VerticalAlignment="Center"
            TextWrapping="Wrap"
-           TextAlignment="Center">
+           TextAlignment="Left">
             <TextBlock.Visibility>
                 <MultiBinding Converter="{StaticResource ShadowConvert}">
                     <Binding ElementName="textBox" Path="Text"/>
