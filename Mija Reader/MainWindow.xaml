@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mija_Reader"
+        xmlns:additionalControls="clr-namespace:Mija_Reader.AdditionalControls"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
@@ -37,12 +38,12 @@
 
                     <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
                         <ListView SelectionMode="Single">
-                            
+
                         </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
                         <ListView SelectionMode="Single">
-                            
+
                         </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="2" Header="{Binding SelectedLanguage.Search}" MinWidth="200">
@@ -305,7 +306,30 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </TabItem>
-            <TabItem Header="{Binding SelectedLanguage.Reader}"></TabItem>
+            <TabItem Header="{Binding SelectedLanguage.Reader}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <ScrollViewer x:Name="tvImageScrool" Grid.ColumnSpan="2" Grid.RowSpan="3">
+                        <additionalControls:ZoomPanel>
+                            <Image x:Name="tvImageView" RenderTransformOrigin="0.5, 0.5" ContextMenu="{DynamicResource MainCM}">
+                                <Image.Resources>
+                                    <ContextMenu x:Key ="MainCM">
+
+                                    </ContextMenu>
+                                </Image.Resources>
+                            </Image>
+                        </additionalControls:ZoomPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Settings}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -319,13 +343,13 @@
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Column="0" Grid.Row="0" Header="{Binding SelectedLanguage.LanguageString}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <ComboBox x:Name="c_LanguageCB" ItemsSource="{Binding Languages}"  SelectionChanged="c_LanguageCB_SelectionChanged">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding LanguageName}"></TextBlock>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                        <ComboBox x:Name="c_LanguageCB" ItemsSource="{Binding Languages}"  SelectionChanged="c_LanguageCB_SelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding LanguageName}"></TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </GroupBox>
                     <GroupBox Grid.Column="0" Grid.Row="1" Header="{Binding SelectedLanguage.ChaptersDirection}" MaxHeight="45" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <ComboBox x:Name="c_ChapterDirectionCB" SelectionChanged="c_ChapterDirectionCB_SelectionChanged">

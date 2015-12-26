@@ -115,7 +115,6 @@ namespace Mija_Reader.Core
                 return false;
             }
         }
-
         public bool IsChapterMarkedAsReadInManga(string Name, string Website, string ChapterName, string ChapterWebsite)
         {
             if (!IsChapterExistInManga(Name, Website, ChapterName, ChapterWebsite))
@@ -214,7 +213,6 @@ namespace Mija_Reader.Core
                 return false;
             }
         }
-
         public bool AddManga(ObservableCollection<MangaPageData> DetailedInfo, PlaceInLibrary place)
         {
             if (IsMangaExist(DetailedInfo.FirstOrDefault().Name, DetailedInfo.FirstOrDefault().Website))

@@ -21,7 +21,7 @@
         <RichTextBox x:Name="tvDetails" Grid.Column="1" Grid.RowSpan="2" IsEnabled="False" Focusable="False" Cursor="Arrow"></RichTextBox>
         <RichTextBox x:Name="tvDescription" Grid.ColumnSpan="2" Grid.Row="2" IsEnabled="False" Focusable="False"  Cursor="Arrow"></RichTextBox>
         <Button x:Name="tvAddToLibrary" Grid.ColumnSpan="2" Grid.Row="3" Margin="3" IsEnabled="True" Click="tvAddToLibrary_Click" Width="30" Height="30"
-								HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="{Binding viewModel.AddToLibraryTooltip}">
+								HorizontalAlignment="Left" VerticalAlignment="Top">
             <Canvas Width="30" Height="30" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
                 <Path Width="20" Height="20" Canvas.Left="4" Canvas.Top="4" Stretch="Fill" 
 										Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}" Data="F1 M 18,40L 36,40L 36,58L 18,58L 18,40 Z M 40,58L 40,40L 58,40L 58,58L 40,58 Z M 40,36L 40,18L 58,18L 58,36L 40,36 Z M 29,36L 25,36L 25,29L 18,29L 18,25L 25,25L 25,18L 29,18L 29,25L 36,25L 36,29L 29,29L 29,36 Z "/>
