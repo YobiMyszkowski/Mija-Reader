@@ -296,6 +296,18 @@ namespace Mija_Reader.Core
             get { return _PrevImage; }
             set { _PrevImage = value; RaisePropertyChanged("PrevImage"); }
         }
+        private string _Page = "Page";
+        public string Page
+        {
+            get { return _Page; }
+            set { _Page = value; RaisePropertyChanged("Page"); }
+        }
+        private string _CheckForNewChaptersMessage = "Please wait till program finish checking for new chapters";
+        public string CheckForNewChaptersMessage
+        {
+            get { return _CheckForNewChaptersMessage; }
+            set { _CheckForNewChaptersMessage = value; RaisePropertyChanged("CheckForNewChaptersMessage"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

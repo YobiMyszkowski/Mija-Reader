@@ -172,6 +172,19 @@ namespace Mija_Reader
             PreviewKeyDown += (s, e) =>
             {
                 Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
+                if (key.Equals(Key.F11) || (e.KeyboardDevice.Modifiers.Equals(ModifierKeys.Alt) && key.Equals(Key.Enter)))
+                {
+                    if (Topmost == false)
+                    {
+                        Topmost = true;
+                        WindowState = WindowState.Maximized;
+                    }
+                    else
+                    {
+                        Topmost = false;
+                        WindowState = WindowState.Normal;
+                    }
+                }
                 if (key.Equals(Key.Right))
                 {
                     if ((c_MainTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Reader)
@@ -208,9 +221,29 @@ namespace Mija_Reader
                             tvImageScrool.ScrollToVerticalOffset(tvImageScrool.VerticalOffset - 10);
                     }
                 }
+                if (e.KeyboardDevice.Modifiers.Equals(ModifierKeys.Control) && key.Equals(Key.Space))
+                {
+                    tvImageViewZoomBorder.Reset();
+                }
+                if (e.KeyboardDevice.Modifiers.Equals(ModifierKeys.Control) && key.Equals(Key.Add))
+                {
+                    //scale up just 5x
+                    tvImageViewZoomBorder.ScaleUp(.5);
+                }
+                if (e.KeyboardDevice.Modifiers.Equals(ModifierKeys.Control) && key.Equals(Key.Subtract))
+                {
+                    //scale down just 5x
+                    tvImageViewZoomBorder.ScaleDown(.5);
+                }
+                if (key.Equals(Key.F5))
+                {
+                    if ((c_MainTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Library && (c_LibraryTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Reading)
+                    {
+                        CheckForNewChapters();
+                    };
+                }
             };
         }
-
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
             #region ini settings
@@ -359,13 +392,10 @@ namespace Mija_Reader
                     loginServer.SelectedIndex = 0;
                     if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
                     {
-                        //(c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
                         for (int i = 1; i < c_MainTabTC.Items.Count; i++)
                         {
                             (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
                         }
-                        //c_MainTabTC.SelectedIndex = 1;
-
                         try
                         {
                             _client = new DropNetClient(_apiKey, _appsecret);
@@ -381,17 +411,13 @@ namespace Mija_Reader
                     }
                     else
                     {
-                        //(c_MainTabTC.Items[0] as TabItem).IsEnabled = true;
                         for (int i = 1; i < c_MainTabTC.Items.Count; i++)
                         {
                             (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
                         }
-                        //c_MainTabTC.SelectedIndex = 0;
-
                         try
                         {
                             _client = new DropNetClient(_apiKey, _appsecret);
-                            // Sync
                             _client.GetToken();
 
                             var url = _client.BuildAuthorizeUrl();
@@ -440,16 +466,13 @@ namespace Mija_Reader
                 {
                     if (accessToken != null)
                     {
-                        //Store this token for "remember me" function
                         MyIni.Write("accessToken", accessToken.Token, "DropBox");
                         MyIni.Write("accessSecret", accessToken.Secret, "DropBox");
 
-                        //(c_MainTabTC.Items[0] as TabItem).IsEnabled = false;
                         for (int i = 1; i < c_MainTabTC.Items.Count; i++)
                         {
                             (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
                         }
-                        //c_MainTabTC.SelectedIndex = 1;
                         loginSyncLibrary.IsEnabled = true;
                     }
                 },
@@ -673,6 +696,8 @@ namespace Mija_Reader
             SelectedLanguage.ClosePage = c.ClosePage;
             SelectedLanguage.PrevImage = c.PrevImage;
             SelectedLanguage.NextImage = c.NextImage;
+            SelectedLanguage.Page = c.Page;
+            SelectedLanguage.CheckForNewChaptersMessage = c.CheckForNewChaptersMessage;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
@@ -1716,7 +1741,7 @@ namespace Mija_Reader
             {
                 tvImageView.Source = ImageList[(sender as ListView).SelectedIndex];
 
-                SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex).Name, (sender as ListView).SelectedIndex + 1, ReaderInfo.Last().MaxPages);
+                SelectedLanguage.WindowTitle = string.Format("'{0}'-{1}: {2}/{3}", ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex).Name, SelectedLanguage.Page, (sender as ListView).SelectedIndex + 1, ReaderInfo.Last().MaxPages);
 
                 if ((sender as ListView).SelectedIndex == 0)
                 {
@@ -1787,8 +1812,7 @@ namespace Mija_Reader
 
                             if (tvChaptersList.SelectedItem != null)
                                 itm = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
-
-                            SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", itm.Name, 1, ReaderInfo.Last().MaxPages);
+                            SelectedLanguage.WindowTitle = string.Format("'{0}'-{1}: {2}/{3}", itm.Name, SelectedLanguage.Page, 1, ReaderInfo.Last().MaxPages);
 
                             if (itm != null)
                             {
@@ -1858,7 +1882,7 @@ namespace Mija_Reader
                     if (selectedListView.FirstOrDefault().SelectedIndex != -1)
                     {
                         item = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
-                        SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", item.Name, 1, ReaderInfo.Last().MaxPages);
+                        SelectedLanguage.WindowTitle = string.Format("'{0}'-{1}: {2}/{3}", item.Name, SelectedLanguage.Page, 1, ReaderInfo.Last().MaxPages);
                     }
 
                     if (item != null)
@@ -1901,13 +1925,12 @@ namespace Mija_Reader
                         }
                     }
 
-                    MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                    MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem; // prev
                     prevmenu.IsEnabled = false;
                     MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
                     nextmenu.IsEnabled = false;
 
-                    tvImageView.Source = null;
-                    
+                    tvImageView.Source = null;                   
                     SelectedLanguage.WindowTitle = "";
 
                     ReaderInfo.Clear();
@@ -1922,7 +1945,7 @@ namespace Mija_Reader
             }
             else
             {
-                MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem;
+                MenuItem prevmenu = menu.Items.GetItemAt(1) as MenuItem; // prev
                 prevmenu.IsEnabled = true;
                 MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
                 nextmenu.IsEnabled = true;
@@ -1985,6 +2008,64 @@ namespace Mija_Reader
         private void MenuItem_Click_NextPage(object sender, RoutedEventArgs e)
         {
             NextImage();
+        }
+        private async void CheckForNewChapters()
+        {
+            if (ReadingData.Count > 0)
+            {
+                tvLibraryUpdateText.Visibility = Visibility.Visible;
+                tvLibraryUpdateProgress.Visibility = Visibility.Visible;
+                tvLibraryUpdateProgress.Maximum = ReadingData.Count;
+
+                for (int i = 0; i < ReadingData.Count; i++)
+                {
+                    tvLibraryUpdateProgress.Value = i;
+
+                    BaseMangaSource.MangaPageData item = ReadingData.ElementAt(i);
+                    // check if good parser is choosed
+                    if (SearchPluginData.ElementAt(c_SearchCB.SelectedIndex).Website == item.UrlToMainpage)
+                    {
+                        // dont do anything we got good parser
+                    }
+                    else
+                    {
+                        // pick up good parser
+                        for (int j = 0; j < SearchPluginData.Count; j++)
+                        {
+                            c_SearchCB.SelectedIndex = j;
+                            if (SearchPluginData.ElementAt(c_SearchCB.SelectedIndex).Website == item.UrlToMainpage)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    ChaptersInfo.Clear();
+                    bool result = await parser.ParseSelectedPageAsync(item.Website, true, null, ChaptersInfo);
+
+                    if (result == true)
+                    {
+                        int getSavedChapters = library.GetChaptersAmount(item.Name, item.Website);
+                        int getUnreadChapters = item.UnreadChapters;
+                        if ((getSavedChapters + getUnreadChapters) < ChaptersInfo.Count)
+                        {
+                            int newChapters = ChaptersInfo.Count - (getSavedChapters + getUnreadChapters);
+                            library.ChangeUnreadChapters(item.Name, item.Website, string.Format("{0}", newChapters + getUnreadChapters));
+                            item.UnreadChapters = newChapters + getUnreadChapters;
+
+                            MoveItemTopEnd(true);
+                        }
+                    }
+                }
+                library.Save();
+
+                tvLibraryUpdateText.Visibility = Visibility.Collapsed;
+                tvLibraryUpdateProgress.Visibility = Visibility.Collapsed;
+                tvLibraryUpdateProgress.Value = 0;
+            }
+            else
+            {
+            }
         }
     }
 }

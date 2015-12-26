@@ -313,7 +313,7 @@
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ScrollViewer x:Name="tvImageScrool" Grid.ColumnSpan="2" Grid.RowSpan="3">
-                        <additionalControls:ZoomPanel ClipToBounds="True">
+                        <additionalControls:ZoomPanel x:Name="tvImageViewZoomBorder" ClipToBounds="True">
                             <Image x:Name="tvImageView" RenderTransformOrigin="0.5, 0.5" ContextMenu="{DynamicResource MainCM}">
                                 <Image.Resources>
                                     <ContextMenu x:Key ="MainCM">
@@ -389,5 +389,10 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <!-- progressbar (checking for new chapters/loading images to reader) -->
+        <StackPanel VerticalAlignment="Center" Background="Transparent" Visibility="{Binding Visibility, ElementName=tvLibraryUpdateProgress}">
+            <TextBlock x:Name="tvLibraryUpdateText" Text="{Binding SelectedLanguage.CheckForNewChaptersMessage}" Background="Transparent" HorizontalAlignment="Center" Visibility="Collapsed" Foreground="Gray"/>
+            <ProgressBar x:Name="tvLibraryUpdateProgress" Background="Transparent" Visibility="Collapsed" Height="10"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -12,3 +12,12 @@ That gonna be my own <b>manga/manhwa/manhua reader</b>.
 <br><li>sync library with online storage (atm only dropbox.com supported)
 <br><li>viewing chapters is working (you can mark chapters as read)
 <br><li>basic settings system (saving to .ini file)
+<br><li>view online (wait till first chapter finish laoding and all next wil be kept loading in background)
+<br><li>check for new chapters
+<br>
+<br>Hotkeys:
+<br>
+<br><li>ctrl+add = zoom up; ctrl+subtract = zoom down; ctrl+space = reset zoom and panning; left mouse click and move (drag) = panning
+<br><li>arrows navigating in Reader: right = next page; left = previous page; down = scrool down; up = scrool up
+<br><li>F11 or alt+enter = maximize/restore
+<br><li>F5 check for new chapters (working only when you are in Library->Reading tab)

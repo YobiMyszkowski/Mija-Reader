@@ -49,5 +49,7 @@
         public string ClosePage { get { return "Close"; } }
         public string PrevImage { get { return "Previous image"; } }
         public string NextImage { get { return "Next image"; } }
+        public string Page { get { return "Page"; } }
+        public string CheckForNewChaptersMessage { get { return "Please wait till program finish checking for new chapters"; } }      
     }
 }
