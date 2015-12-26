@@ -308,6 +308,156 @@ namespace Mija_Reader.Core
             get { return _CheckForNewChaptersMessage; }
             set { _CheckForNewChaptersMessage = value; RaisePropertyChanged("CheckForNewChaptersMessage"); }
         }
+        private string _Author = "Author";
+        public string Author
+        {
+            get { return _Author; }
+            set { _Author = value; RaisePropertyChanged("Author"); }
+        }
+        private string _Artist = "Artist";
+        public string Artist
+        {
+            get { return _Artist; }
+            set { _Artist = value; RaisePropertyChanged("Artist"); }
+        }
+        private string _Name = "Name";
+        public string Name
+        {
+            get { return _Name; }
+            set { _Name = value; RaisePropertyChanged("Name"); }
+        }
+        private string _AlternateName = "Alternate names";
+        public string AlternateName
+        {
+            get { return _AlternateName; }
+            set { _AlternateName = value; RaisePropertyChanged("AlternateName"); }
+        }
+        private string _YearOfRelease = "Year of release";
+        public string YearOfRelease
+        {
+            get { return _YearOfRelease; }
+            set { _YearOfRelease = value; RaisePropertyChanged("YearOfRelease"); }
+        }
+        private string _Status = "Status";
+        public string Status
+        {
+            get { return _Status; }
+            set { _Status = value; RaisePropertyChanged("Status"); }
+        }
+        private string _Direction = "Reading direction";
+        public string Direction
+        {
+            get { return _Direction; }
+            set { _Direction = value; RaisePropertyChanged("Direction"); }
+        }
+        private string _Genre = "Genre";
+        public string Genre
+        {
+            get { return _Genre; }
+            set { _Genre = value; RaisePropertyChanged("Genre"); }
+        }
+        private string _Completed = "Completed";
+        public string Completed
+        {
+            get { return _Completed; }
+            set { _Completed = value; RaisePropertyChanged("Completed"); }
+        }
+        private string _Ongoing = "Ongoing";
+        public string Ongoing
+        {
+            get { return _Ongoing; }
+            set { _Ongoing = value; RaisePropertyChanged("Ongoing"); }
+        }
+        private string _MangaRTL = "Manga (Right to Left)";
+        public string MangaRTL
+        {
+            get { return _MangaRTL; }
+            set { _MangaRTL = value; RaisePropertyChanged("MangaRTL"); }
+        }
+        private string _ManhwaLTR = "Manhwa (Left to Right)";
+        public string ManhwaLTR
+        {
+            get { return _ManhwaLTR; }
+            set { _ManhwaLTR = value; RaisePropertyChanged("ManhwaLTR"); }
+        }
+        private string _ScroolBar_ScroolHere = "Scrool Here";
+        public string ScroolBar_ScroolHere
+        {
+            get { return _ScroolBar_ScroolHere; }
+            set { _ScroolBar_ScroolHere = value; RaisePropertyChanged("ScroolBar_ScroolHere"); }
+        }
+        private string _ScroolBar_Top = "Top";
+        public string ScroolBar_Top
+        {
+            get { return _ScroolBar_Top; }
+            set { _ScroolBar_Top = value; RaisePropertyChanged("ScroolBar_Top"); }
+        }
+        private string _ScroolBar_Bottom = "Bottom";
+        public string ScroolBar_Bottom
+        {
+            get { return _ScroolBar_Bottom; }
+            set { _ScroolBar_Bottom = value; RaisePropertyChanged("ScroolBar_Bottom"); }
+        }
+        private string _ScroolBar_PageUp = "Page up";
+        public string ScroolBar_PageUp
+        {
+            get { return _ScroolBar_PageUp; }
+            set { _ScroolBar_PageUp = value; RaisePropertyChanged("ScroolBar_PageUp"); }
+        }
+        private string _ScroolBar_PageDown = "Page down";
+        public string ScroolBar_PageDown
+        {
+            get { return _ScroolBar_PageDown; }
+            set { _ScroolBar_PageDown = value; RaisePropertyChanged("ScroolBar_PageDown"); }
+        }
+        private string _ScroolBar_ScroolUp = "Scrool up";
+        public string ScroolBar_ScroolUp
+        {
+            get { return _ScroolBar_ScroolUp; }
+            set { _ScroolBar_ScroolUp = value; RaisePropertyChanged("ScroolBar_ScroolUp"); }
+        }
+        private string _ScroolBar_ScroolDown = "Scrool down";
+        public string ScroolBar_ScroolDown
+        {
+            get { return _ScroolBar_ScroolDown; }
+            set { _ScroolBar_ScroolDown = value; RaisePropertyChanged("ScroolBar_ScroolDown"); }
+        }
+        private string _ScroolBar_LeftEdge = "Left edge";
+        public string ScroolBar_LeftEdge
+        {
+            get { return _ScroolBar_LeftEdge; }
+            set { _ScroolBar_LeftEdge = value; RaisePropertyChanged("ScroolBar_LeftEdge"); }
+        }
+        private string _ScroolBar_RightEdge = "Right edge";
+        public string ScroolBar_RightEdge
+        {
+            get { return _ScroolBar_RightEdge; }
+            set { _ScroolBar_RightEdge = value; RaisePropertyChanged("ScroolBar_RightEdge"); }
+        }
+        private string _ScroolBar_PageLeft = "Page left";
+        public string ScroolBar_PageLeft
+        {
+            get { return _ScroolBar_PageLeft; }
+            set { _ScroolBar_PageLeft = value; RaisePropertyChanged("ScroolBar_PageLeft"); }
+        }
+        private string _ScroolBar_PageRight = "Page right";
+        public string ScroolBar_PageRight
+        {
+            get { return _ScroolBar_PageRight; }
+            set { _ScroolBar_PageRight = value; RaisePropertyChanged("ScroolBar_PageRight"); }
+        }
+        private string _ScroolBar_ScroolLeft = "Scrool left";
+        public string ScroolBar_ScroolLeft
+        {
+            get { return _ScroolBar_ScroolLeft; }
+            set { _ScroolBar_ScroolLeft = value; RaisePropertyChanged("ScroolBar_ScroolLeft"); }
+        }
+        private string _ScroolBar_ScroolRight = "Scrool right";
+        public string ScroolBar_ScroolRight
+        {
+            get { return _ScroolBar_ScroolRight; }
+            set { _ScroolBar_ScroolRight = value; RaisePropertyChanged("ScroolBar_ScroolRight"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

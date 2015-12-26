@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Reflection; //Assembly
+using System.Reflection;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
@@ -10,11 +10,11 @@ using System.Windows.Navigation;
 using System.Windows.Media.Imaging;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DropNet;
 using System.Collections.Generic;
+using DropNet;
 using Mija_Reader.AdditionalControls;
 
-
+#region extensions
 namespace System.Windows.Controls
 {
     public static class MyExt2
@@ -84,6 +84,7 @@ namespace System.Windows.Controls
         }
     }
 }
+#endregion
 namespace Mija_Reader
 {
     public partial class MainWindow : Window
@@ -671,6 +672,31 @@ namespace Mija_Reader
             SelectedLanguage.NextImage = c.NextImage;
             SelectedLanguage.Page = c.Page;
             SelectedLanguage.CheckForNewChaptersMessage = c.CheckForNewChaptersMessage;
+            SelectedLanguage.Author = c.Author;
+            SelectedLanguage.Artist = c.Artist;
+            SelectedLanguage.Name = c.Name;
+            SelectedLanguage.AlternateName = c.AlternateName;
+            SelectedLanguage.YearOfRelease = c.YearOfRelease;
+            SelectedLanguage.Status = c.Status;
+            SelectedLanguage.Direction = c.Direction;
+            SelectedLanguage.Genre = c.Genre;
+            SelectedLanguage.Completed = c.Completed;
+            SelectedLanguage.Ongoing = c.Ongoing;
+            SelectedLanguage.MangaRTL = c.MangaRTL;
+            SelectedLanguage.ManhwaLTR = c.ManhwaLTR;
+            SelectedLanguage.ScroolBar_ScroolHere = c.ScroolBar_ScroolHere;
+            SelectedLanguage.ScroolBar_Top = c.ScroolBar_Top;
+            SelectedLanguage.ScroolBar_Bottom = c.ScroolBar_Bottom;
+            SelectedLanguage.ScroolBar_PageUp = c.ScroolBar_PageUp;
+            SelectedLanguage.ScroolBar_PageDown = c.ScroolBar_PageDown;
+            SelectedLanguage.ScroolBar_ScroolUp = c.ScroolBar_ScroolUp;
+            SelectedLanguage.ScroolBar_ScroolDown = c.ScroolBar_ScroolDown;
+            SelectedLanguage.ScroolBar_LeftEdge = c.ScroolBar_LeftEdge;
+            SelectedLanguage.ScroolBar_RightEdge = c.ScroolBar_RightEdge;
+            SelectedLanguage.ScroolBar_PageLeft = c.ScroolBar_PageLeft;
+            SelectedLanguage.ScroolBar_PageRight = c.ScroolBar_PageRight;
+            SelectedLanguage.ScroolBar_ScroolLeft = c.ScroolBar_ScroolLeft;
+            SelectedLanguage.ScroolBar_ScroolRight = c.ScroolBar_ScroolRight;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
@@ -953,34 +979,34 @@ namespace Mija_Reader
 
                             details.tvDescription.AppendText(DetailedInfo.FirstOrDefault().Description, "Gray");
 
-                            details.tvDetails.AppendText("Name" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Name + ": ", "LightBlue");
                             details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Name, "Gray");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText("AlternateName" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.AlternateName + ": ", "LightBlue");
                             details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().AlternateName, "Gray");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText("YearOfRelease" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.YearOfRelease + ": ", "LightBlue");
                             details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().YearOfRelease, "Gray");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText("Status" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Status + ": ", "LightBlue");
                             if (DetailedInfo.FirstOrDefault().Status == BaseMangaSource.MangaStatus.Completed)
-                                details.tvDetails.AppendText("Completed", "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.Completed, "Gray");
                             else
-                                details.tvDetails.AppendText("Ongoing", "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.Ongoing, "Gray");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText("Author" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Author + ": ", "LightBlue");
                             details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Author, "Gray");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText("Artist" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Artist + ": ", "LightBlue");
                             details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Artist, "Gray");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText("Directin" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Direction + ": ", "LightBlue");
                             if (DetailedInfo.FirstOrDefault().Type == BaseMangaSource.MangaType.Manga_RightToLeft)
-                                details.tvDetails.AppendText("manga", "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.MangaRTL, "Gray");
                             else
-                                details.tvDetails.AppendText("manhwa", "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.ManhwaLTR, "Gray");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText("Genre" + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Genre + ": ", "LightBlue");
                             details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Genre, "Gray");
                             details.tvDetails.AppendText("\r");
                         }

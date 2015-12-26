@@ -25,6 +25,7 @@
            FontStyle="Italic"
            Text="{Binding ElementName=Root, Path=Watermark}"
            VerticalAlignment="Center"
+           Margin="5, 0, 0, 0"
            TextWrapping="Wrap"
            TextAlignment="Left">
             <TextBlock.Visibility>

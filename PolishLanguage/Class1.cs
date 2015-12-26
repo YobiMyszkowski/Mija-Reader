@@ -51,5 +51,30 @@
         public string NextImage { get { return "Kolejny obraz"; } }
         public string Page { get { return "Strona"; } }
         public string CheckForNewChaptersMessage { get { return "Proszę czekać, aż program skończy sprawdzać czy są dostępne nowe rozdziały"; } }
+        public string Author { get { return "Autor"; } }
+        public string Artist { get { return "Artysta"; } }
+        public string Name { get { return "Nazwa"; } }
+        public string AlternateName { get { return "Nazwy alternatywne"; } }
+        public string YearOfRelease { get { return "Rok wydania"; } }
+        public string Status { get { return "Status"; } }
+        public string Direction { get { return "Kierunek czytania"; } }
+        public string Genre { get { return "Gatunek"; } }
+        public string Completed { get { return "Skończona"; } }
+        public string Ongoing { get { return "Publikowana"; } }
+        public string MangaRTL { get { return "Manga (od Prawej do Lewej)"; } }
+        public string ManhwaLTR { get { return "Manhwa (od Lewej do Prawej)"; } }
+        public string ScroolBar_ScroolHere { get { return "Przewiń tutaj"; } }
+        public string ScroolBar_Top { get { return "Góra"; } }
+        public string ScroolBar_Bottom { get { return "Dół"; } }
+        public string ScroolBar_PageUp { get { return "Strona w górę"; } }
+        public string ScroolBar_PageDown { get { return "Strona w dół"; } }
+        public string ScroolBar_ScroolUp { get { return "Przewiń w górę"; } }
+        public string ScroolBar_ScroolDown { get { return "Przewiń w dół"; } }
+        public string ScroolBar_LeftEdge { get { return "Lewa krawędź"; } }
+        public string ScroolBar_RightEdge { get { return "Prawa krawędź"; } }
+        public string ScroolBar_PageLeft { get { return "Strona w lewo"; } }
+        public string ScroolBar_PageRight { get { return "Strona w prawo"; } }
+        public string ScroolBar_ScroolLeft { get { return "Przewiń w lewo"; } }
+        public string ScroolBar_ScroolRight { get { return "Przewiń w prawo"; } }
     }
 }

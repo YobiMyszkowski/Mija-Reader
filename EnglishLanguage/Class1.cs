@@ -50,6 +50,31 @@
         public string PrevImage { get { return "Previous image"; } }
         public string NextImage { get { return "Next image"; } }
         public string Page { get { return "Page"; } }
-        public string CheckForNewChaptersMessage { get { return "Please wait till program finish checking for new chapters"; } }      
+        public string CheckForNewChaptersMessage { get { return "Please wait till program finish checking for new chapters"; } }
+        public string Author { get { return "Author"; } }
+        public string Artist { get { return "Artist"; } }
+        public string Name { get { return "Name"; } }
+        public string AlternateName { get { return "Alternate names"; } }
+        public string YearOfRelease { get { return "Year of release"; } }
+        public string Status { get { return "Status"; } }
+        public string Direction { get { return "Reading direction"; } }
+        public string Genre { get { return "Genre"; } }
+        public string Completed { get { return "Completed"; } }
+        public string Ongoing { get { return "Ongoing"; } }
+        public string MangaRTL { get { return "Manga (Right to Left)"; } }
+        public string ManhwaLTR { get { return "Manhwa (Left to Right)"; } }
+        public string ScroolBar_ScroolHere { get { return "Scrool Here"; } }
+        public string ScroolBar_Top { get { return "Top"; } }
+        public string ScroolBar_Bottom { get { return "Bottom"; } }
+        public string ScroolBar_PageUp { get { return "Page up"; } }
+        public string ScroolBar_PageDown { get { return "Page down"; } }
+        public string ScroolBar_ScroolUp { get { return "Scrool up"; } }
+        public string ScroolBar_ScroolDown { get { return "Scrool down"; } }
+        public string ScroolBar_LeftEdge { get { return "Left edge"; } }
+        public string ScroolBar_RightEdge { get { return "Right edge"; } }
+        public string ScroolBar_PageLeft { get { return "Page left"; } }
+        public string ScroolBar_PageRight { get { return "Page right"; } }
+        public string ScroolBar_ScroolLeft { get { return "Scrool left"; } }
+        public string ScroolBar_ScroolRight { get { return "Scrool right"; } }
     }
 }

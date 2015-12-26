@@ -35,15 +35,48 @@
                         <ColumnDefinition Width="150"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-
                     <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
                         <ListView SelectionMode="Single">
-
+                            <ListView.Resources>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.Resources>
                         </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
                         <ListView SelectionMode="Single">
-
+                            <ListView.Resources>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.Resources>
                         </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="2" Header="{Binding SelectedLanguage.Search}" MinWidth="200">
@@ -75,6 +108,24 @@
                                 <AdditionalControls:SearchTextBox x:Name="tvSearchText" Watermark="searching quote" KeyUp="SearchTextBox_KeyUp"/>
                             </StackPanel>
                             <ListView x:Name="tvSearchResults" Grid.Row="1" VerticalAlignment="Stretch" SelectionMode="Single" ItemsSource="{Binding SearchResultsData}" MouseDoubleClick="ListView_MouseDoubleClick">
+                                <ListView.Resources>
+                                    <Style TargetType="{x:Type ScrollBar}">
+                                        <Style.Triggers>
+                                            <Trigger Property="Orientation" Value="Horizontal">
+                                                <Setter Property="Width" Value="Auto"/>
+                                                <Setter Property="Height" Value="18" />
+                                                <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                                <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                            </Trigger>
+                                            <Trigger Property="Orientation" Value="Vertical">
+                                                <Setter Property="Width" Value="18"/>
+                                                <Setter Property="Height" Value="Auto" />
+                                                <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                                <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListView.Resources>
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Grid ToolTip="{Binding Name}" Width="100">
@@ -93,7 +144,6 @@
                                     <ItemsPanelTemplate>
                                         <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
 											ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
-											MinWidth="{Binding ItemWidth, RelativeSource={RelativeSource Self}}"
 											ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
                                     </ItemsPanelTemplate>
                                 </ListView.ItemsPanel>
@@ -132,6 +182,22 @@
                                     <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
 												CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
                                 </ContextMenu>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
                             </ListView.Resources>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -193,6 +259,22 @@
                                     <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
 												CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
                                 </ContextMenu>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
                             </ListView.Resources>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -219,7 +301,6 @@
                                         </StackPanel>
                                     </Grid>
                                 </DataTemplate>
-
                             </ListView.ItemTemplate>
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -254,6 +335,22 @@
                                     <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
 												CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
                                 </ContextMenu>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                            <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
                             </ListView.Resources>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -302,6 +399,22 @@
                             <MenuItem Header="{Binding SelectedLanguage.MarkAsRead}" Click="MenuItem_Click_MarkAsRead"/>
                             <MenuItem Header="{Binding SelectedLanguage.MarkAllPreviousAsRead}" Click="MenuItem_Click_MarkAllPreviousAsRead"/>
                         </ContextMenu>
+                        <Style TargetType="{x:Type ScrollBar}">
+                            <Style.Triggers>
+                                <Trigger Property="Orientation" Value="Horizontal">
+                                    <Setter Property="Width" Value="Auto"/>
+                                    <Setter Property="Height" Value="18" />
+                                    <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                    <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                </Trigger>
+                                <Trigger Property="Orientation" Value="Vertical">
+                                    <Setter Property="Width" Value="18"/>
+                                    <Setter Property="Height" Value="Auto" />
+                                    <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                    <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
                     </ListView.Resources>
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -331,6 +444,24 @@
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ScrollViewer x:Name="tvImageScrool" Grid.ColumnSpan="2" Grid.RowSpan="3">
+                        <ScrollViewer.Resources>
+                            <Style TargetType="{x:Type ScrollBar}">
+                                <Style.Triggers>
+                                    <Trigger Property="Orientation" Value="Horizontal">
+                                        <Setter Property="Width" Value="Auto"/>
+                                        <Setter Property="Height" Value="18" />
+                                        <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                        <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                    </Trigger>
+                                    <Trigger Property="Orientation" Value="Vertical">
+                                        <Setter Property="Width" Value="18"/>
+                                        <Setter Property="Height" Value="Auto" />
+                                        <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                        <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ScrollViewer.Resources>
                         <additionalControls:ZoomPanel x:Name="tvImageViewZoomBorder" ClipToBounds="True">
                             <Image x:Name="tvImageView" RenderTransformOrigin="0.5, 0.5" ContextMenu="{DynamicResource MainCM}">
                                 <Image.Resources>
@@ -354,6 +485,22 @@
                             <ContextMenu x:Key ="MainCM">
                                 <MenuItem Header="{Binding SelectedLanguage.RefreshImage}"/>
                             </ContextMenu>
+                            <Style TargetType="{x:Type ScrollBar}">
+                                <Style.Triggers>
+                                    <Trigger Property="Orientation" Value="Horizontal">
+                                        <Setter Property="Width" Value="Auto"/>
+                                        <Setter Property="Height" Value="18" />
+                                        <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                        <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                    </Trigger>
+                                    <Trigger Property="Orientation" Value="Vertical">
+                                        <Setter Property="Width" Value="18"/>
+                                        <Setter Property="Height" Value="Auto" />
+                                        <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                        <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
                         </ListView.Resources>
                         <ListView.ItemTemplate>
                             <DataTemplate>
