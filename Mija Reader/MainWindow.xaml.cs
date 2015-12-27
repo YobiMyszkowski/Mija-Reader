@@ -374,26 +374,28 @@ namespace Mija_Reader
                         {
                             int pos = filePaths.ToList<string>()[i].LastIndexOf(@"\") + 1;                
                             SearchPluginData.Add(LoadPluginByWebsite(filePaths.ToList<string>()[i].Substring(pos)));
-
-                            if (MyIni.KeyExists("MangaSource", "WindowData"))
-                            {
-                                if (MyIni.Read("MangaSource", "WindowData") == SearchPluginData.ElementAt(i).Website)
-                                {
-                                    parser = SearchPluginData.ElementAt(i);
-                                    c_SearchCB.SelectedIndex = i;
-                                    c_SearchCB.ToolTip = parser.Website + ", " + parser.Lang + ", " + parser.Author;
-                                }
-                            }
-                            else
-                            {
-                                c_SearchCB.SelectedIndex = 0;
-                            }
                         }
                         catch (Exception ex)
                         {
                             throw new Exception(ex.Message);
                         }
                         c_SearchCB.IsEnabled = true;
+                    }
+                    for (int i = 0; i < SearchPluginData.Count(); i++)
+                    {
+                        if (MyIni.KeyExists("MangaSource", "WindowData"))
+                        {
+                            if (MyIni.Read("MangaSource", "WindowData") == SearchPluginData.ElementAt(i).Website)
+                            {
+                                parser = SearchPluginData.ElementAt(i);
+                                c_SearchCB.SelectedIndex = i;
+                                c_SearchCB.ToolTip = parser.Website + ", " + parser.Lang + ", " + parser.Author;
+                            }
+                        }
+                        else
+                        {
+                            c_SearchCB.SelectedIndex = 0;
+                        }
                     }
                 }
             }
@@ -1038,37 +1040,37 @@ namespace Mija_Reader
 
                             details.tvImage.Source = new BitmapImage(new Uri(DetailedInfo.FirstOrDefault().Image));
 
-                            details.tvDescription.AppendText(DetailedInfo.FirstOrDefault().Description, "Gray");
+                            details.tvDescription.AppendText(DetailedInfo.FirstOrDefault().Description, "Black");
 
-                            details.tvDetails.AppendText(SelectedLanguage.Name + ": ", "LightBlue");
-                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Name, "Gray");
+                            details.tvDetails.AppendText(SelectedLanguage.Name + ": ", "DarkBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Name, "Black");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText(SelectedLanguage.AlternateName + ": ", "LightBlue");
-                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().AlternateName, "Gray");
+                            details.tvDetails.AppendText(SelectedLanguage.AlternateName + ": ", "DarkBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().AlternateName, "Black");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText(SelectedLanguage.YearOfRelease + ": ", "LightBlue");
-                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().YearOfRelease, "Gray");
+                            details.tvDetails.AppendText(SelectedLanguage.YearOfRelease + ": ", "DarkBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().YearOfRelease, "Black");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText(SelectedLanguage.Status + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Status + ": ", "DarkBlue");
                             if (DetailedInfo.FirstOrDefault().Status == BaseMangaSource.MangaStatus.Completed)
-                                details.tvDetails.AppendText(SelectedLanguage.Completed, "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.Completed, "Black");
                             else
-                                details.tvDetails.AppendText(SelectedLanguage.Ongoing, "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.Ongoing, "Black");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText(SelectedLanguage.Author + ": ", "LightBlue");
-                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Author, "Gray");
+                            details.tvDetails.AppendText(SelectedLanguage.Author + ": ", "DarkBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Author, "Black");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText(SelectedLanguage.Artist + ": ", "LightBlue");
-                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Artist, "Gray");
+                            details.tvDetails.AppendText(SelectedLanguage.Artist + ": ", "DarkBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Artist, "Black");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText(SelectedLanguage.Direction + ": ", "LightBlue");
+                            details.tvDetails.AppendText(SelectedLanguage.Direction + ": ", "DarkBlue");
                             if (DetailedInfo.FirstOrDefault().Type == BaseMangaSource.MangaType.Manga_RightToLeft)
-                                details.tvDetails.AppendText(SelectedLanguage.MangaRTL, "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.MangaRTL, "Black");
                             else
-                                details.tvDetails.AppendText(SelectedLanguage.ManhwaLTR, "Gray");
+                                details.tvDetails.AppendText(SelectedLanguage.ManhwaLTR, "Black");
                             details.tvDetails.AppendText("\r");
-                            details.tvDetails.AppendText(SelectedLanguage.Genre + ": ", "LightBlue");
-                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Genre, "Gray");
+                            details.tvDetails.AppendText(SelectedLanguage.Genre + ": ", "DarkBlue");
+                            details.tvDetails.AppendText(DetailedInfo.FirstOrDefault().Genre, "Black");
                             details.tvDetails.AppendText("\r");
                         }
                         else

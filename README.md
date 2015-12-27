@@ -3,8 +3,8 @@
 That gonna be my own <b>manga/manhwa/manhua reader</b>.
 <br><b>Available Features</b>:
 <br><li>language system (atm only 2 plugins english language and polish)
-<br><li>multiple manga sources without need to redownload program after new source available (atm only mangareader.net, soon more)
-<br><li>search system (search manga via name)
+<br><li>multiple manga sources without need to redownload program after new source available (mangareader.net, mangapanda.com, more incomeing)
+<br><li>search system (search manga via quote)
 <br><li>viewing details about selected manga
 <br><li>adding manga to library
 <br><li>moving manga between library tabs (via context menu)
