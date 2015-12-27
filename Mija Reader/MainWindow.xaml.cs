@@ -83,7 +83,18 @@ namespace System.Windows.Controls
             }
         }
     }
+    public static class WindowExtensions
+    {
+        public static void MoveAndResize(this Window value, double horizontalChange, double verticalChange, double width, double height)
+        {
+            value.Left = horizontalChange;
+            value.Top = verticalChange;
+            value.Width = width;
+            value.Height = height;
+        }
+    }
 }
+
 #endregion
 namespace Mija_Reader
 {
@@ -172,6 +183,8 @@ namespace Mija_Reader
             DataContext = this;
 
             SourceInitialized += MainWindow_SourceInitialized;
+            
+
             #region Shortkuts
             PreviewKeyDown += (s, e) =>
             {
@@ -254,6 +267,47 @@ namespace Mija_Reader
             #region ini settings
             MyIni = new Core.Ini("Settings.ini");
             #endregion
+
+            #region load_PositionAndState
+            double x = 0; double y = 0; double w = 700; double h = 540; string s = "Normal";
+
+            if (MyIni.KeyExists("x", "WindowPosition"))
+            {
+                x = Double.Parse(MyIni.Read("x", "WindowPosition"));
+            }
+            if (MyIni.KeyExists("y", "WindowPosition"))
+            {
+                y = Double.Parse(MyIni.Read("y", "WindowPosition"));
+            }
+            if (MyIni.KeyExists("w", "WindowPosition"))
+            {
+                w = Double.Parse(MyIni.Read("w", "WindowPosition"));
+            }
+            if (MyIni.KeyExists("h", "WindowPosition"))
+            {
+                h = Double.Parse(MyIni.Read("h", "WindowPosition"));
+            }
+            if (MyIni.KeyExists("State", "WindowPosition"))
+            {
+                s = MyIni.Read("State", "WindowPosition");
+            }
+
+            this.MoveAndResize(x, y, w, h);
+
+            if (s == "Normal")
+            {
+                WindowState = WindowState.Normal;
+            }
+            else if (s == "Maximized")
+            {
+                WindowState = WindowState.Maximized;
+            }
+            else // we dont start with minimized
+            {
+                WindowState = WindowState.Normal;
+            }
+            #endregion
+
             #region load_Languages
             if (System.IO.Directory.Exists(System.IO.Directory.GetCurrentDirectory().ToString() + @"\Data\Languages\") == true)
             {
@@ -455,6 +509,18 @@ namespace Mija_Reader
         }
         protected override void OnClosed(EventArgs e)
         {
+            if (WindowState == WindowState.Normal)
+            {
+                MyIni.Write("x", this.Left.ToString(), "WindowPosition");
+                MyIni.Write("y", this.Top.ToString(), "WindowPosition");
+                MyIni.Write("w", this.Width.ToString(), "WindowPosition");
+                MyIni.Write("h", this.Height.ToString(), "WindowPosition");
+            }
+            if(WindowState != WindowState.Minimized)
+                MyIni.Write("State", string.Format("{0}", WindowState), "WindowPosition");
+            else
+                MyIni.Write("State", string.Format("{0}", WindowState.Normal), "WindowPosition");
+
             base.OnClosed(e);
             Application.Current.Shutdown();
         }
