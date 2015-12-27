@@ -441,6 +441,8 @@ namespace Mija_Reader
             #endregion
 
             #region Initialize Syncing library
+            c_MainTabTC.SelectedIndex = 1; //start from home
+
             loginAfterFirstRun:
             if (MyIni.KeyExists("SyncSerwer", "WindowData"))
             {
@@ -451,10 +453,7 @@ namespace Mija_Reader
                     loginServer.SelectedIndex = 0;
                     if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
                     {
-                        for (int i = 1; i < c_MainTabTC.Items.Count; i++)
-                        {
-                            (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
-                        }
+                        loginSyncLibrary.IsEnabled = true;
                         try
                         {
                             _client = new DropNetClient(_apiKey, _appsecret);
@@ -470,10 +469,7 @@ namespace Mija_Reader
                     }
                     else
                     {
-                        for (int i = 1; i < c_MainTabTC.Items.Count; i++)
-                        {
-                            (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
-                        }
+                        loginSyncLibrary.IsEnabled = false;
                         try
                         {
                             _client = new DropNetClient(_apiKey, _appsecret);
@@ -533,7 +529,6 @@ namespace Mija_Reader
 
             if (browserContents.Contains(SelectedLanguage.WebBrowserSucces))
             {
-                
                 _client.GetAccessTokenAsync((accessToken) =>
                 {
                     if (accessToken != null)
@@ -543,11 +538,6 @@ namespace Mija_Reader
 
                         this.Dispatcher.BeginInvoke((Action)(() =>
                         {
-                            for (int i = 0; i < c_MainTabTC.Items.Count; i++)
-                            {
-                                MessageBox.Show((c_MainTabTC.Items[i] as TabItem).Header.ToString());
-                                (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
-                            }
                             loginSyncLibrary.IsEnabled = true;
                         }));
                     }
