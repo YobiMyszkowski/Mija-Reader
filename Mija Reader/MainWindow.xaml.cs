@@ -474,7 +474,7 @@ namespace Mija_Reader
                         {
                             _client = new DropNetClient(_apiKey, _appsecret);
                             _client.GetToken();
-
+                            
                             var url = _client.BuildAuthorizeUrl();
 
                             loginBrowser.Navigate(url);
@@ -527,7 +527,8 @@ namespace Mija_Reader
 
             string browserContents = doc.Body.InnerText;
 
-            if (browserContents.Contains(SelectedLanguage.WebBrowserSucces))
+            if (browserContents.Contains("Udało się! Mija Reader jest teraz połączona z Twoim kontem Dropbox.") != //PL
+                browserContents.Contains("Success! Mija Reader is connected to your Dropbox.")) //EN
             {
                 _client.GetAccessTokenAsync((accessToken) =>
                 {
@@ -690,7 +691,6 @@ namespace Mija_Reader
             SelectedLanguage.Reading = c.Reading;
             SelectedLanguage.Finished = c.Finished;
             SelectedLanguage.Abandoned = c.Abandoned;
-            SelectedLanguage.WebBrowserSucces = c.WebBrowserSucces;
             SelectedLanguage.Login = c.Login;
             SelectedLanguage.Home = c.Home;
             SelectedLanguage.Library = c.Library;

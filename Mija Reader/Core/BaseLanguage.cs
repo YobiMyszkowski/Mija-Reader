@@ -40,12 +40,6 @@ namespace Mija_Reader.Core
             get { return _Abandoned; }
             set { _Abandoned = value; RaisePropertyChanged("Abandoned"); }
         }
-        private string _WebBrowserSucces = "Udało się! Mija Reader jest teraz połączona z Twoim kontem Dropbox.";
-        public string WebBrowserSucces
-        {
-            get { return _WebBrowserSucces; }
-            set { _WebBrowserSucces = value; RaisePropertyChanged("WebBrowserSucces"); }
-        }
         private string _Login = "Login";
         public string Login
         {

@@ -8,7 +8,6 @@
         public string Reading { get { return "Czytane"; } }
         public string Finished { get { return "Zakończone"; } }
         public string Abandoned { get { return "Porzucone"; } }
-        public string WebBrowserSucces { get { return "Udało się! Mija Reader jest teraz połączona z Twoim kontem Dropbox."; } }
         public string Login { get { return "Zaloguj się"; } }
         public string Home { get { return "Dom"; } }
         public string Library { get { return "Biblioteka"; } }
