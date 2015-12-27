@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel; //INotifyPropertyChanged
+﻿using System.ComponentModel; //INotifyPropertyChanged
 
 namespace Mija_Reader.Core
 {

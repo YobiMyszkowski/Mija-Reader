@@ -36,7 +36,7 @@
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
-                        <ListView SelectionMode="Single">
+                        <ListView SelectionMode="Single" ItemsSource="{Binding LastRead}">
                             <ListView.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
                                     <Style.Triggers>
@@ -55,6 +55,16 @@
                                     </Style.Triggers>
                                 </Style>
                             </ListView.Resources>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Expander Header="">
+                                            <ListBox>
+                                            </ListBox>
+                                        </Expander>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
                         </ListView>
                     </GroupBox>
                     <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">

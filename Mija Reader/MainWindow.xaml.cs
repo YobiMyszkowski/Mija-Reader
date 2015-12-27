@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Collections.Generic;
+using System.ComponentModel; //INotifyPropertyChanged
 using DropNet;
 using Mija_Reader.AdditionalControls;
 
@@ -181,9 +182,8 @@ namespace Mija_Reader
         {
             InitializeComponent();
             DataContext = this;
-
-            SourceInitialized += MainWindow_SourceInitialized;
             
+            SourceInitialized += MainWindow_SourceInitialized;
 
             #region Shortkuts
             PreviewKeyDown += (s, e) =>
@@ -533,6 +533,7 @@ namespace Mija_Reader
 
             if (browserContents.Contains(SelectedLanguage.WebBrowserSucces))
             {
+                
                 _client.GetAccessTokenAsync((accessToken) =>
                 {
                     if (accessToken != null)
@@ -540,11 +541,15 @@ namespace Mija_Reader
                         MyIni.Write("accessToken", accessToken.Token, "DropBox");
                         MyIni.Write("accessSecret", accessToken.Secret, "DropBox");
 
-                        for (int i = 1; i < c_MainTabTC.Items.Count; i++)
+                        this.Dispatcher.BeginInvoke((Action)(() =>
                         {
-                            (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
-                        }
-                        loginSyncLibrary.IsEnabled = true;
+                            for (int i = 0; i < c_MainTabTC.Items.Count; i++)
+                            {
+                                MessageBox.Show((c_MainTabTC.Items[i] as TabItem).Header.ToString());
+                                (c_MainTabTC.Items[i] as TabItem).IsEnabled = true;
+                            }
+                            loginSyncLibrary.IsEnabled = true;
+                        }));
                     }
                 },
                 (error) =>
@@ -1383,6 +1388,7 @@ namespace Mija_Reader
             if (selectedListView.FirstOrDefault().SelectedIndex != -1)
             {
                 BaseMangaSource.MangaPageData panel = data.ElementAt(selectedListView.FirstOrDefault().SelectedIndex);
+
                 if (panel != null)
                 {
                     BaseMangaSource.MangaPageChapters selectedChapter = null;
