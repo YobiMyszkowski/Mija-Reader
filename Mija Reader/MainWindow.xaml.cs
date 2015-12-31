@@ -15,6 +15,8 @@ using System.ComponentModel; //INotifyPropertyChanged
 using DropNet;
 using Mija_Reader.AdditionalControls;
 
+using TweetSharp;
+
 #region extensions
 namespace System.Windows.Controls
 {
@@ -95,7 +97,6 @@ namespace System.Windows.Controls
         }
     }
 }
-
 #endregion
 namespace Mija_Reader
 {
@@ -177,6 +178,8 @@ namespace Mija_Reader
             get { return _NextReaderInfo; }
             set { _NextReaderInfo = value; }
         }
+        TwitterService service = null;
+        OAuthRequestToken requestToken = null;
         #endregion
         public MainWindow()
         {
@@ -439,6 +442,44 @@ namespace Mija_Reader
             {
                 MyIni.Write("ChapterDisplayDirection", "Start", "WindowData");
                 c_ChapterDirectionCB.SelectedIndex = 0;
+            }
+            #endregion
+
+            #region Twitter
+            // Pass your credentials to the service
+            service = new TwitterService("V0TLKBLRGlQREbF5J5qPxldUb", "RiXwzKK5l3U9HKxKO88mDdr4lsThrVlsuW0iKBjh7vHSddpwzX");
+            if (MyIni.KeyExists("accessToken", "Twitter") && MyIni.KeyExists("accessSecret", "Twitter") && MyIni.Read("accessToken", "Twitter") != "?" && MyIni.Read("accessSecret", "Twitter") != "?")
+            {
+                // Step 4 - User authenticates using the Access Token
+                service.AuthenticateWith(MyIni.Read("accessToken", "Twitter"), MyIni.Read("accessSecret", "Twitter"));
+
+                tvTwitterPinButton.IsEnabled = false;
+                tvTwitterPin.IsEnabled = false;
+                tvTwitterBrowser.IsEnabled = false;
+
+                tvTweetReader.IsEnabled = true;
+            }
+            else
+            {
+                // Step 1 - Retrieve an OAuth Request Token
+                service.GetRequestToken((token, response) =>
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        // Step 2 - Redirect to the OAuth Authorization URL
+                        requestToken = token;
+                        Uri uri = service.GetAuthorizationUri(token);
+
+                        this.Dispatcher.BeginInvoke((Action)(() =>
+                        {
+                            tvTwitterBrowser.Navigate(uri);
+                        }));
+                    }
+                    else
+                    {
+                        MessageBox.Show("error ocured");
+                    }
+                });
             }
             #endregion
 
@@ -2322,6 +2363,55 @@ namespace Mija_Reader
             }
 
             return parser;
+        }
+        #endregion
+
+        #region Twitter
+        private void Twitter_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(tvTwitterPin.Text != null)
+            {
+                try
+                {
+                    // Step 3 - Exchange the Request Token for an Access Token
+                    string verifier = tvTwitterPin.Text.ToString(); // <-- This is input into your application by your user
+                    OAuthAccessToken access = service.GetAccessToken(requestToken, verifier);
+                    // Step 4 - User authenticates using the Access Token
+                    service.AuthenticateWith(access.Token, access.TokenSecret);
+
+                    tvTwitterPinButton.IsEnabled = false;
+                    tvTwitterPin.IsEnabled = false;
+                    tvTwitterBrowser.IsEnabled = false;
+                    if(access.Token != "?")
+                        tvTweetReader.IsEnabled = true;
+
+                    MyIni.Write("accessToken", access.Token, "Twitter");
+                    MyIni.Write("accessSecret", access.TokenSecret, "Twitter");
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
+        }
+
+        private void tvTweetReader_Click(object sender, RoutedEventArgs e)
+        {
+            if (tvImageView.Source != null)
+            {
+                MetroMessageBox mbox = new MetroMessageBox();
+                mbox.MessageBoxBtnYes.Click += (s, en) =>
+                {
+                    mbox.Close();
+                    service.SendTweet(new SendTweetOptions
+                    {
+                        Status = tvImageView.Source.ToString()
+                    });
+                };
+                mbox.MessageBoxBtnYes.Content = SelectedLanguage.Yes;
+                mbox.MessageBoxBtnNo.Content = SelectedLanguage.No; mbox.MessageBoxBtnNo.Click += (s, en) => { mbox.Close(); };
+                mbox.ShowMessage(this, "Would you like to share this image on your twitter?", SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.YesNo);
+            }
         }
         #endregion
     }

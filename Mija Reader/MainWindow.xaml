@@ -532,6 +532,9 @@
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                     </ListView>
+                    <Button x:Name="tvTweetReader" Height="20" Width="20" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="False" Click="tvTweetReader_Click">
+                        <Image Source="tweet.ico"></Image>
+                    </Button>
                 </Grid>
             </TabItem>
             <TabItem Header="{Binding SelectedLanguage.Settings}">
@@ -560,6 +563,15 @@
                             <ComboBoxItem Content="{Binding SelectedLanguage.FromStartToEnd}"></ComboBoxItem>
                             <ComboBoxItem Content="{Binding SelectedLanguage.FromEndToStart}"></ComboBoxItem>
                         </ComboBox>
+                    </GroupBox>
+                    <GroupBox Header="Twitter" Grid.Column="1" Grid.RowSpan="4">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                                <AdditionalControls:SearchTextBox x:Name="tvTwitterPin" Watermark="pin for authorization" HorizontalAlignment="Stretch"/>
+                                <Button x:Name="tvTwitterPinButton" Content="Authorize" Click="Twitter_Button_Click"></Button>
+                            </StackPanel>
+                            <WebBrowser DockPanel.Dock="Bottom" Name="tvTwitterBrowser" VerticalAlignment="Stretch"></WebBrowser>
+                        </DockPanel>
                     </GroupBox>
                 </Grid>
             </TabItem>
