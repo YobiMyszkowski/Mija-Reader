@@ -448,6 +448,26 @@ namespace Mija_Reader.Core
             get { return _ScroolBar_ScroolRight; }
             set { _ScroolBar_ScroolRight = value; RaisePropertyChanged("ScroolBar_ScroolRight"); }
         }
+        private string _WouldYouLikeToShareThisImageTwitter = "Would you like to share this image with friends on your twitter?";
+        public string WouldYouLikeToShareThisImageTwitter
+        {
+            get { return _WouldYouLikeToShareThisImageTwitter; }
+            set { _WouldYouLikeToShareThisImageTwitter = value; RaisePropertyChanged("WouldYouLikeToShareThisImageTwitter"); }
+        }
+        private string _Authorize = "Authorize";
+        public string Authorize
+        {
+            get { return _Authorize; }
+            set { _Authorize = value; RaisePropertyChanged("Authorize"); }
+        }
+        private string _PinCodeToConnectTwitterWithAPP = "PIN code for authorization";
+        public string PinCodeToConnectTwitterWithAPP
+        {
+            get { return _PinCodeToConnectTwitterWithAPP; }
+            set { _PinCodeToConnectTwitterWithAPP = value; RaisePropertyChanged("PinCodeToConnectTwitterWithAPP"); }
+        }
+
+
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

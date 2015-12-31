@@ -15,6 +15,7 @@ That gonna be my own <b>manga/manhwa/manhua reader</b>.
 <br><li>view online (wait till first chapter finish laoding and all next wil be kept loading in background)
 <br><li>check for new chapters
 <br><li>drag and drop in library (atm only allow to move items in one library/moving items via drag and drop dont allow to move from one library to another)
+<br><li>twitter integration (atm you can sync yours account with it and share displayed image in Reader view; More incomeing soon :>)
 <br>
 <br><b>Hotkeys</b>:
 <br>

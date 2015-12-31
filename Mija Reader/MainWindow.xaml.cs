@@ -801,6 +801,9 @@ namespace Mija_Reader
             SelectedLanguage.ScroolBar_PageRight = c.ScroolBar_PageRight;
             SelectedLanguage.ScroolBar_ScroolLeft = c.ScroolBar_ScroolLeft;
             SelectedLanguage.ScroolBar_ScroolRight = c.ScroolBar_ScroolRight;
+            SelectedLanguage.WouldYouLikeToShareThisImageTwitter = c.WouldYouLikeToShareThisImageTwitter;
+            SelectedLanguage.Authorize = c.Authorize;
+            SelectedLanguage.PinCodeToConnectTwitterWithAPP = c.PinCodeToConnectTwitterWithAPP;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
@@ -2410,7 +2413,7 @@ namespace Mija_Reader
                 };
                 mbox.MessageBoxBtnYes.Content = SelectedLanguage.Yes;
                 mbox.MessageBoxBtnNo.Content = SelectedLanguage.No; mbox.MessageBoxBtnNo.Click += (s, en) => { mbox.Close(); };
-                mbox.ShowMessage(this, "Would you like to share this image on your twitter?", SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.YesNo);
+                mbox.ShowMessage(this, SelectedLanguage.WouldYouLikeToShareThisImageTwitter, SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.YesNo);
             }
         }
         #endregion

@@ -567,8 +567,8 @@
                     <GroupBox Header="Twitter" Grid.Column="1" Grid.RowSpan="4">
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                                <AdditionalControls:SearchTextBox x:Name="tvTwitterPin" Watermark="pin for authorization" HorizontalAlignment="Stretch"/>
-                                <Button x:Name="tvTwitterPinButton" Content="Authorize" Click="Twitter_Button_Click"></Button>
+                                <AdditionalControls:SearchTextBox x:Name="tvTwitterPin" Watermark="{Binding SelectedLanguage.PinCodeToConnectTwitterWithAPP}" HorizontalAlignment="Stretch"/>
+                                <Button x:Name="tvTwitterPinButton" Content="{Binding SelectedLanguage.Authorize}" Click="Twitter_Button_Click"></Button>
                             </StackPanel>
                             <WebBrowser DockPanel.Dock="Bottom" Name="tvTwitterBrowser" VerticalAlignment="Stretch"></WebBrowser>
                         </DockPanel>

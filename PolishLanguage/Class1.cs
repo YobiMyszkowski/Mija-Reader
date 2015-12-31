@@ -75,5 +75,8 @@
         public string ScroolBar_PageRight { get { return "Strona w prawo"; } }
         public string ScroolBar_ScroolLeft { get { return "Przewiń w lewo"; } }
         public string ScroolBar_ScroolRight { get { return "Przewiń w prawo"; } }
+        public string WouldYouLikeToShareThisImageTwitter { get { return "Czy chciałbyś podzielić się tym obrazem z przyjaciółmi na swoim Twitterze?"; } }
+        public string Authorize { get { return "Autoryzuj"; } }
+        public string PinCodeToConnectTwitterWithAPP { get { return "kod PIN do autoryzacji"; } }
     }
 }
