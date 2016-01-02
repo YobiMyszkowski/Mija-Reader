@@ -104,7 +104,19 @@ namespace MangaParser
                    Website, SearchQuote, Page);
             }
         }
+        private bool _LoadImagesFromOnePage = false;
+        public bool LoadImagesFromOnePage
+        {
+            get
+            {
+                return _LoadImagesFromOnePage;
+            }
 
+            set
+            {
+                _LoadImagesFromOnePage = value;
+            }
+        }
         public async Task<bool> ParseSearchAsync(string SearchQuote, bool IgnorePages, int PageNumber, ObservableCollection<BaseMangaSource.MangaSearchData> SearchResults)
         {
             _ErrorMessage = "";

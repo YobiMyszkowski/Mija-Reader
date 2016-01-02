@@ -175,7 +175,8 @@
 									DragEnter="ListViewDragEnter"
 									Drop="ListViewDrop"
 									PreviewMouseMove="ListViewPreviewMouseMove"
-									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown">
+									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown"
+                                  SelectionChanged="ListView_SelectionChanged">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
@@ -252,7 +253,8 @@
 									DragEnter="ListViewDragEnter"
 									Drop="ListViewDrop"
 									PreviewMouseMove="ListViewPreviewMouseMove"
-									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown">
+									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown"
+                                  SelectionChanged="ListView_SelectionChanged">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
@@ -328,7 +330,8 @@
 								    DragEnter="ListViewDragEnter"
 									Drop="ListViewDrop"
 									PreviewMouseMove="ListViewPreviewMouseMove"
-									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown">
+									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown"
+                                  SelectionChanged="ListView_SelectionChanged">
                             <ListView.Resources>
                                 <ContextMenu x:Key="MainCM">
                                     <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>

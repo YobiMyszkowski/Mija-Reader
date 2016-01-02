@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.ComponentModel; //INotifyPropertyChanged
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace BaseMangaSource
@@ -161,6 +162,8 @@ namespace BaseMangaSource
         public string PrewLink { get { return _PrewLink; } set { if (_PrewLink != value) { _PrewLink = value; RaisePropertyChanged("PrewLink"); } } } // previous page link
         private uint _MaxPages;
         public uint MaxPages { get { return _MaxPages; } set { if (_MaxPages != value) { _MaxPages = value; RaisePropertyChanged("MaxPages"); } } } // max pages number
+        private List<string> _Covers = new List<string>();
+        public List<string> Covers { get { return _Covers; } set { if (_Covers != value) { _Covers = value; RaisePropertyChanged("Covers"); } } } // list off all images/work only LoadImagesFromOnePage=true
 
         #region Methods
         public event PropertyChangedEventHandler PropertyChanged;
@@ -187,6 +190,7 @@ namespace BaseMangaSource
         int FirstPage { get; }
         string SearchQuote { get; set; }
         string ErrorMessage { get; }
+        bool LoadImagesFromOnePage { get; }
 
         Task<bool> ParseSearchAsync(string SearchQuote, bool IgnorePages, int PageNumber, ObservableCollection<MangaSearchData> SearchResults);
         Task<bool> ParseSelectedPageAsync(string URL, bool ParseJustChapters, ObservableCollection<MangaPageData> DetailedInfo, ObservableCollection<MangaPageChapters> ChaptersInfo);
