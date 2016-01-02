@@ -78,5 +78,6 @@
         public string WouldYouLikeToShareThisImageTwitter { get { return "Czy chciałbyś podzielić się tym obrazem z przyjaciółmi na swoim Twitterze?"; } }
         public string Authorize { get { return "Autoryzuj"; } }
         public string PinCodeToConnectTwitterWithAPP { get { return "kod PIN do autoryzacji"; } }
+        public string SharedWithMIJA { get { return "Udostępnione przez Mija Reader"; } }
     }
 }

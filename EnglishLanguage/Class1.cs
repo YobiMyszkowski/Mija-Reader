@@ -78,5 +78,6 @@
         public string WouldYouLikeToShareThisImageTwitter { get { return "Would you like to share this image with friends on your twitter?"; } }
         public string Authorize { get { return "Authorize"; } }
         public string PinCodeToConnectTwitterWithAPP { get { return "PIN code for authorization" ; } }
+        public string SharedWithMIJA { get { return "Shared with Mija Reader"; } }
     }
 }

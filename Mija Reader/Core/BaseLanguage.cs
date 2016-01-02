@@ -466,7 +466,12 @@ namespace Mija_Reader.Core
             get { return _PinCodeToConnectTwitterWithAPP; }
             set { _PinCodeToConnectTwitterWithAPP = value; RaisePropertyChanged("PinCodeToConnectTwitterWithAPP"); }
         }
-
+        private string _SharedWithMIJA = "Shared with Mija Reader";
+        public string SharedWithMIJA
+        {
+            get { return _SharedWithMIJA; }
+            set { _SharedWithMIJA = value; RaisePropertyChanged("SharedWithMIJA"); }
+        }
 
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;

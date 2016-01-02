@@ -803,6 +803,7 @@ namespace Mija_Reader
             SelectedLanguage.WouldYouLikeToShareThisImageTwitter = c.WouldYouLikeToShareThisImageTwitter;
             SelectedLanguage.Authorize = c.Authorize;
             SelectedLanguage.PinCodeToConnectTwitterWithAPP = c.PinCodeToConnectTwitterWithAPP;
+            SelectedLanguage.SharedWithMIJA = c.SharedWithMIJA;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
@@ -2452,10 +2453,30 @@ namespace Mija_Reader
                 mbox.MessageBoxBtnYes.Click += (s, en) =>
                 {
                     mbox.Close();
-                    service.SendTweet(new SendTweetOptions
+
+                    try
                     {
-                        Status = tvImageView.Source.ToString()
-                    });
+                        using (System.Net.WebClient web = new System.Net.WebClient())
+                        {
+                            web.DownloadDataAsync(new Uri(tvImageView.Source.ToString()));
+                            web.DownloadDataCompleted += (ws, we) =>
+                            {
+                                byte[] streamInBytes = we.Result;
+                                using (System.IO.Stream stream = new System.IO.MemoryStream(streamInBytes))
+                                {
+                                    service.SendTweetWithMedia(new SendTweetWithMediaOptions
+                                    {
+                                        Status = Title + "; "+SelectedLanguage.SharedWithMIJA,
+                                        Images = new Dictionary<string, System.IO.Stream> { { tvImageView.Source.ToString(), stream } }
+                                    });
+                                }
+                            };
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.Message);
+                    }
                 };
                 mbox.MessageBoxBtnYes.Content = SelectedLanguage.Yes;
                 mbox.MessageBoxBtnNo.Content = SelectedLanguage.No; mbox.MessageBoxBtnNo.Click += (s, en) => { mbox.Close(); };
