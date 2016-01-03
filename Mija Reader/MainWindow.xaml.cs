@@ -2444,7 +2444,6 @@ namespace Mija_Reader
                 }
             }
         }
-
         private void tvTweetReader_Click(object sender, RoutedEventArgs e)
         {
             if (tvImageView.Source != null)

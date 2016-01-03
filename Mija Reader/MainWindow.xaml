@@ -35,7 +35,7 @@
                         <ColumnDefinition Width="150"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" MinWidth="100">
+                    <GroupBox Grid.Column="0" Header="{Binding SelectedLanguage.LastRead}" Visibility="Collapsed" MinWidth="100">
                         <ListView SelectionMode="Single" ItemsSource="{Binding LastRead}">
                             <ListView.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
@@ -67,7 +67,7 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </GroupBox>
-                    <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" MinWidth="100">
+                    <GroupBox Grid.Column="1" Header="{Binding SelectedLanguage.NewChapters}" Visibility="Collapsed" MinWidth="100">
                         <ListView SelectionMode="Single">
                             <ListView.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
@@ -89,7 +89,7 @@
                             </ListView.Resources>
                         </ListView>
                     </GroupBox>
-                    <GroupBox Grid.Column="2" Header="{Binding SelectedLanguage.Search}" MinWidth="200">
+                    <GroupBox Grid.ColumnSpan="3" Header="{Binding SelectedLanguage.Search}" MinWidth="200">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"></RowDefinition>
@@ -169,7 +169,8 @@
             <TabItem Header="{Binding SelectedLanguage.Library}">
                 <TabControl x:Name="c_LibraryTabTC">
                     <TabItem Header="{Binding SelectedLanguage.Reading}">
-                        <ListView ItemsSource="{Binding ReadingData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" 
+                        <Grid>
+                            <ListView ItemsSource="{Binding ReadingData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" 
                                   MouseRightButtonUp="tvLibrary_MouseRightButtonUp"
                                   AllowDrop="True"
 									DragEnter="ListViewDragEnter"
@@ -177,74 +178,75 @@
 									PreviewMouseMove="ListViewPreviewMouseMove"
 									PreviewMouseLeftButtonDown="ListViewMouseLeftButtonDown"
                                   SelectionChanged="ListView_SelectionChanged">
-                            <ListView.Resources>
-                                <ContextMenu x:Key="MainCM">
-                                    <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
-                                    <MenuItem Header="{Binding SelectedLanguage.Move}" IsEnabled="False">
-                                        <MenuItem Header="{Binding SelectedLanguage.Up}" Click="MoveUp" IsEnabled="False"/>
-                                        <MenuItem Header="{Binding SelectedLanguage.Down}" Click="MoveDown" IsEnabled="False"/>
-                                        <MenuItem Header="{Binding SelectedLanguage.Top}" Click="MoveTop" IsEnabled="False"/>
-                                        <MenuItem Header="{Binding SelectedLanguage.End}" Click="MoveEnd" IsEnabled="False"/>
-                                    </MenuItem>
-                                    <MenuItem Header="{Binding SelectedLanguage.MoveTo}" IsEnabled="False">
-                                        <MenuItem Header="{Binding SelectedLanguage.Finished, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToFinished" IsEnabled="False"/>
-                                        <MenuItem Header="{Binding SelectedLanguage.Abandoned, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToAbandoned" IsEnabled="False"/>
-                                    </MenuItem>
-                                    <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
+                                <ListView.Resources>
+                                    <ContextMenu x:Key="MainCM">
+                                        <MenuItem Header="{Binding SelectedLanguage.ShowChapters}" Click="MenuItem_Click_ShowChaptersLibrary" IsEnabled="False"/>
+                                        <MenuItem Header="{Binding SelectedLanguage.Move}" IsEnabled="False">
+                                            <MenuItem Header="{Binding SelectedLanguage.Up}" Click="MoveUp" IsEnabled="False"/>
+                                            <MenuItem Header="{Binding SelectedLanguage.Down}" Click="MoveDown" IsEnabled="False"/>
+                                            <MenuItem Header="{Binding SelectedLanguage.Top}" Click="MoveTop" IsEnabled="False"/>
+                                            <MenuItem Header="{Binding SelectedLanguage.End}" Click="MoveEnd" IsEnabled="False"/>
+                                        </MenuItem>
+                                        <MenuItem Header="{Binding SelectedLanguage.MoveTo}" IsEnabled="False">
+                                            <MenuItem Header="{Binding SelectedLanguage.Finished, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToFinished" IsEnabled="False"/>
+                                            <MenuItem Header="{Binding SelectedLanguage.Abandoned, Converter={StaticResource ToLowerValueConverter}}" Click="MenuItem_Click_MoveToAbandoned" IsEnabled="False"/>
+                                        </MenuItem>
+                                        <MenuItem Header="{Binding SelectedLanguage.RemoveFromLibrary}" Click="MenuItem_Click_RemoveFromLibrary"
 												CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
-                                </ContextMenu>
-                                <Style TargetType="{x:Type ScrollBar}">
-                                    <Style.Triggers>
-                                        <Trigger Property="Orientation" Value="Horizontal">
-                                            <Setter Property="Width" Value="Auto"/>
-                                            <Setter Property="Height" Value="18" />
-                                            <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
-                                            <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
-                                        </Trigger>
-                                        <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
-                                            <Setter Property="Height" Value="Auto" />
-                                            <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
-                                            <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ListView.Resources>
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <!-- fill grid background-->
-                                        <Image Grid.Row="0" Grid.Column="0" Width="100" Source="{Binding Image, Converter={StaticResource StringToImageSourceValueConverter}}"/>
-                                        <TextBlock Text="{Binding UnreadChapters}" Foreground="White" Background="Black" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
-                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,0" Visibility="Visible">
-                                            <TextBlock  Text="{Binding Name}" FontWeight="Normal" Foreground="Gray" FontSize="15"/>
-                                            <TextBlock  Text="{Binding AlternateName}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
-                                            <TextBlock  Text="{Binding YearOfRelease}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
-                                            <TextBlock  Text="{Binding Status, Converter={StaticResource MangaStatusToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
-                                            <TextBlock  Text="{Binding Type, Converter={StaticResource MangaTypeToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
-                                            <TextBlock  Text="{Binding Author}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
-                                            <TextBlock  Text="{Binding Genre}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
-                                            <TextBlock  Text="{Binding Website}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
-                                        </StackPanel>
-                                    </Grid>
-                                </DataTemplate>
+                                    </ContextMenu>
+                                    <Style TargetType="{x:Type ScrollBar}">
+                                        <Style.Triggers>
+                                            <Trigger Property="Orientation" Value="Horizontal">
+                                                <Setter Property="Width" Value="Auto"/>
+                                                <Setter Property="Height" Value="18" />
+                                                <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+                                                <Setter Property="Template" Value="{DynamicResource HorizontalScrollBar}" />
+                                            </Trigger>
+                                            <Trigger Property="Orientation" Value="Vertical">
+                                                <Setter Property="Width" Value="18"/>
+                                                <Setter Property="Height" Value="Auto" />
+                                                <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+                                                <Setter Property="Template" Value="{DynamicResource VerticalScrollBar}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListView.Resources>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition Width="auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <!-- fill grid background-->
+                                            <Image Grid.Row="0" Grid.Column="0" Width="100" Source="{Binding Image, Converter={StaticResource StringToImageSourceValueConverter}}"/>
+                                            <TextBlock Text="{Binding UnreadChapters}" Foreground="White" Background="Black" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,0" Visibility="Visible">
+                                                <TextBlock  Text="{Binding Name}" FontWeight="Normal" Foreground="Gray" FontSize="15"/>
+                                                <TextBlock  Text="{Binding AlternateName}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                                <TextBlock  Text="{Binding YearOfRelease}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                                <TextBlock  Text="{Binding Status, Converter={StaticResource MangaStatusToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                                <TextBlock  Text="{Binding Type, Converter={StaticResource MangaTypeToStringValueConverter}}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                                <TextBlock  Text="{Binding Author}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                                <TextBlock  Text="{Binding Genre}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                                <TextBlock  Text="{Binding Website}" FontWeight="Normal" Foreground="Gray" FontSize="15" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
 
-                            </ListView.ItemTemplate>
-                            <ListView.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
+                                </ListView.ItemTemplate>
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
 												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
 												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
-                                </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                            </ListView>
+                        </Grid>
                     </TabItem>
                     <TabItem Header="{Binding SelectedLanguage.Finished}">
                         <ListView ItemsSource="{Binding FinishedData}" ContextMenu="{DynamicResource MainCM}" SelectionMode="Single" 
@@ -396,7 +398,8 @@
                                 <ItemsPanelTemplate>
                                     <WrapPanel Width="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType={x:Type ScrollContentPresenter}}}"
 												ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
-												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
+												ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+                                               />
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>
