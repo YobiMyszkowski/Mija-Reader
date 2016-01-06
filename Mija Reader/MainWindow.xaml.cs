@@ -1131,40 +1131,48 @@ namespace Mija_Reader
         {
             bool foundMatch = false;
             string foundIn = "";
-            foreach (TabItem libraryChild in c_LibraryTabTC.Items)
+
+            try
             {
-                ObservableCollection<BaseMangaSource.MangaPageData> data = ((libraryChild.Content as ListView).ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
-                for(int i = 0; i < data.Count; i++)
+                foreach (TabItem libraryChild in c_LibraryTabTC.Items)
                 {
-                    if(data.ElementAt(i).Name == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name && data.ElementAt(i).Website == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website)
+                    ObservableCollection<BaseMangaSource.MangaPageData> data = (libraryChild.FindChildren<ListView>().FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
+                    for (int i = 0; i <= data.Count - 1; i++)
                     {
-                        foundMatch = true;
-                        foundIn = libraryChild.Header.ToString();
-                        break;
+                        if (data.ElementAt(i).Name == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name && data.ElementAt(i).Website == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website)
+                        {
+                            foundMatch = true;
+                            foundIn = libraryChild.Header.ToString();
+                            break;
+                        }
+                    }
+                }
+                if (foundMatch == true)
+                {
+                    MetroMessageBox mbox = new MetroMessageBox();
+                    mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                    mbox.MessageBoxBtnYes.Content = SelectedLanguage.Ok;
+                    mbox.ShowMessage(this, string.Format(SelectedLanguage.MangaAlreadyExist, SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name, foundIn), SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
+                }
+                else
+                {
+                    DetailedInfo.Clear();
+                    bool x = await parser.ParseSelectedPageAsync(SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website, false, DetailedInfo, null);
+
+                    if (ChaptersInfo != null)
+                    {
+                        ReadingData.Add(DetailedInfo.FirstOrDefault());
+                        details.Close();
+                        c_MainTabTC.SelectedIndex = 2;
+                        c_LibraryTabTC.SelectedIndex = 0;
+
+                        library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
                     }
                 }
             }
-            if (foundMatch == true)
+            catch(Exception ex)
             {
-                MetroMessageBox mbox = new MetroMessageBox();
-                mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
-                mbox.MessageBoxBtnYes.Content = SelectedLanguage.Ok;
-                mbox.ShowMessage(this, string.Format(SelectedLanguage.MangaAlreadyExist, SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name, foundIn ), SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
-            }
-            else
-            {
-                DetailedInfo.Clear();
-                bool x = await parser.ParseSelectedPageAsync(SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website, false, DetailedInfo, null);
-
-                if (ChaptersInfo != null)
-                {
-                    ReadingData.Add(DetailedInfo.FirstOrDefault());
-                    details.Close();
-                    c_MainTabTC.SelectedIndex = 2;
-                    c_LibraryTabTC.SelectedIndex = 0;
-
-                    library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
-                }
+                throw new Exception(ex.Message);
             }
         }
         private void MoveItem(int direction)

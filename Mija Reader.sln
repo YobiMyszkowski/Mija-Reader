@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyMangaOnlineNetParser", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodMangaNetParser", "GoodMangaNetParser\GoodMangaNetParser.csproj", "{19F510AB-EE72-459C-8227-FDEB05A46B26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MangaHereCoParser", "MangaHereCoParser\MangaHereCoParser.csproj", "{D17CAEDD-E164-4761-8945-AA89B745EA34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +68,10 @@ Global
 		{19F510AB-EE72-459C-8227-FDEB05A46B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19F510AB-EE72-459C-8227-FDEB05A46B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19F510AB-EE72-459C-8227-FDEB05A46B26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D17CAEDD-E164-4761-8945-AA89B745EA34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D17CAEDD-E164-4761-8945-AA89B745EA34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D17CAEDD-E164-4761-8945-AA89B745EA34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D17CAEDD-E164-4761-8945-AA89B745EA34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +84,6 @@ Global
 		{D6239FE7-CFFE-4A42-80E4-06C2D95655A2} = {717CFA28-6A29-4C13-AC8C-F3D195CB809C}
 		{B1A7A1C9-15C3-479B-880E-5805226506D5} = {717CFA28-6A29-4C13-AC8C-F3D195CB809C}
 		{19F510AB-EE72-459C-8227-FDEB05A46B26} = {717CFA28-6A29-4C13-AC8C-F3D195CB809C}
+		{D17CAEDD-E164-4761-8945-AA89B745EA34} = {717CFA28-6A29-4C13-AC8C-F3D195CB809C}
 	EndGlobalSection
 EndGlobal
