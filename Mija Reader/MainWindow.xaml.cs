@@ -1131,48 +1131,82 @@ namespace Mija_Reader
         {
             bool foundMatch = false;
             string foundIn = "";
-
-            try
+            if (foundMatch == false && AbandonedData.Count > 0)
             {
-                foreach (TabItem libraryChild in c_LibraryTabTC.Items)
+                for (int i = 0; i < AbandonedData.Count; i++)
                 {
-                    ObservableCollection<BaseMangaSource.MangaPageData> data = (libraryChild.FindChildren<ListView>().FirstOrDefault().ItemsSource as ObservableCollection<BaseMangaSource.MangaPageData>);
-                    for (int i = 0; i <= data.Count - 1; i++)
+                    BaseMangaSource.MangaPageData item = AbandonedData.ElementAt(i);
+
+                    if (item != null)
                     {
-                        if (data.ElementAt(i).Name == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name && data.ElementAt(i).Website == SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website)
+                        if (item.Name == DetailedInfo.FirstOrDefault().Name
+                            && item.Website == DetailedInfo.FirstOrDefault().Website)
                         {
                             foundMatch = true;
-                            foundIn = libraryChild.Header.ToString();
+                            foundIn = (c_LibraryTabTC.Items[2] as TabItem).Header.ToString();
                             break;
                         }
                     }
                 }
-                if (foundMatch == true)
+            }
+            if (foundMatch == false && FinishedData.Count > 0)
+            {
+                for (int i = 0; i < FinishedData.Count; i++)
                 {
-                    MetroMessageBox mbox = new MetroMessageBox();
-                    mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
-                    mbox.MessageBoxBtnYes.Content = SelectedLanguage.Ok;
-                    mbox.ShowMessage(this, string.Format(SelectedLanguage.MangaAlreadyExist, SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name, foundIn), SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
-                }
-                else
-                {
-                    DetailedInfo.Clear();
-                    bool x = await parser.ParseSelectedPageAsync(SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website, false, DetailedInfo, null);
+                    BaseMangaSource.MangaPageData item = FinishedData.ElementAt(i);
 
-                    if (ChaptersInfo != null)
+                    if (item != null)
                     {
-                        ReadingData.Add(DetailedInfo.FirstOrDefault());
-                        details.Close();
-                        c_MainTabTC.SelectedIndex = 2;
-                        c_LibraryTabTC.SelectedIndex = 0;
-
-                        library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
+                        if (item.Name == DetailedInfo.FirstOrDefault().Name
+                            && item.Website == DetailedInfo.FirstOrDefault().Website)
+                        {
+                            foundMatch = true;
+                            foundIn = (c_LibraryTabTC.Items[1] as TabItem).Header.ToString();
+                            break;
+                        }
                     }
                 }
             }
-            catch(Exception ex)
+            if (foundMatch == false && ReadingData.Count > 0)
             {
-                throw new Exception(ex.Message);
+                for (int i = 0; i < ReadingData.Count; i++)
+                {
+                    BaseMangaSource.MangaPageData item = ReadingData.ElementAt(i);
+
+                    if (item != null)
+                    {
+                        if (item.Name == DetailedInfo.FirstOrDefault().Name
+                            && item.Website == DetailedInfo.FirstOrDefault().Website)
+                        {
+                            foundMatch = true;
+                            foundIn = (c_LibraryTabTC.Items[0] as TabItem).Header.ToString();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (foundMatch)
+            {
+                MetroMessageBox mbox = new MetroMessageBox();
+                mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                mbox.MessageBoxBtnYes.Content = SelectedLanguage.Ok;
+                mbox.ShowMessage(this, string.Format(SelectedLanguage.MangaAlreadyExist, SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Name, foundIn), SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
+            }
+            else
+            {
+                DetailedInfo.Clear();
+                bool x = await parser.ParseSelectedPageAsync(SearchResultsData.ElementAt(tvSearchResults.SelectedIndex).Website, false, DetailedInfo, null);
+
+                if (ChaptersInfo != null)
+                {
+                    ReadingData.Add(DetailedInfo.FirstOrDefault());
+                    details.Close();
+                    c_MainTabTC.SelectedIndex = 2;
+                    c_LibraryTabTC.SelectedIndex = 0;
+
+                    library.AddManga(DetailedInfo, Core.PlaceInLibrary.Reading);
+                }
             }
         }
         private void MoveItem(int direction)
