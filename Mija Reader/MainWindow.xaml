@@ -459,7 +459,7 @@
                         <RowDefinition></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <ScrollViewer x:Name="tvImageScrool" Grid.ColumnSpan="2" Grid.RowSpan="3">
+                    <ScrollViewer x:Name="tvImageScrool" Grid.ColumnSpan="2" Grid.RowSpan="3" PreviewMouseWheel="tvImageScrool_PreviewMouseWheel">
                         <ScrollViewer.Resources>
                             <Style TargetType="{x:Type ScrollBar}">
                                 <Style.Triggers>

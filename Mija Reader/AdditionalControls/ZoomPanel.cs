@@ -11,19 +11,16 @@ namespace Mija_Reader.AdditionalControls
         private UIElement child = null;
         private Point origin;
         private Point start;
-
         private TranslateTransform GetTranslateTransform(UIElement element)
         {
             return (TranslateTransform)((TransformGroup)element.RenderTransform)
               .Children.First(tr => tr is TranslateTransform);
         }
-
         private ScaleTransform GetScaleTransform(UIElement element)
         {
             return (ScaleTransform)((TransformGroup)element.RenderTransform)
               .Children.First(tr => tr is ScaleTransform);
         }
-
         public override UIElement Child
         {
             get { return base.Child; }
@@ -49,15 +46,13 @@ namespace Mija_Reader.AdditionalControls
                 group.Children.Add(tt);
                 child.RenderTransform = group;
                 child.RenderTransformOrigin = new Point(0.0, 0.0);
-                //this.MouseWheel += child_MouseWheel;
-                this.MouseLeftButtonDown += child_MouseLeftButtonDown;
-                this.MouseLeftButtonUp += child_MouseLeftButtonUp;
-                this.MouseMove += child_MouseMove;
-                //
-                //this.PreviewMouseRightButtonDown += new MouseButtonEventHandler(child_PreviewMouseRightButtonDown);
+                this.MouseLeftButtonDown += ZoomPanel_MouseLeftButtonDown;
+                this.MouseLeftButtonUp += ZoomPanel_MouseLeftButtonUp;
+                this.MouseMove += ZoomPanel_MouseMove;
+
+                this.MouseWheel += ZoomPanel_MouseWheel;
             }
         }
-
         public void Reset()
         {
             if (child != null)
@@ -74,9 +69,7 @@ namespace Mija_Reader.AdditionalControls
                 tt.Y = 0.0;
             }
         }
-
         #region Child Events
-
         public void ScaleUp(double maxZoom)
         {
             if (child != null)
@@ -96,7 +89,7 @@ namespace Mija_Reader.AdditionalControls
                 }
                 if (zoom != maxZoom)
                 {
-                    Point relative = Mouse.GetPosition(child);//e.GetPosition(child);
+                    Point relative = Mouse.GetPosition(child);
                     double abosuluteX;
                     double abosuluteY;
 
@@ -111,7 +104,6 @@ namespace Mija_Reader.AdditionalControls
                 }
             }
         }
-
         public void ScaleDown(double maxZoom)
         {
             if (child != null)
@@ -131,7 +123,7 @@ namespace Mija_Reader.AdditionalControls
                 }
                 if (zoom != maxZoom)
                 {
-                    Point relative = Mouse.GetPosition(child); //e.GetPosition(child);
+                    Point relative = Mouse.GetPosition(child);
                     double abosuluteX;
                     double abosuluteY;
 
@@ -146,34 +138,19 @@ namespace Mija_Reader.AdditionalControls
                 }
             }
         }
-
-        public void child_MouseWheel(object sender, MouseWheelEventArgs e)
+        public void ZoomPanel_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (child != null)
             {
-                var st = GetScaleTransform(child);
-                var tt = GetTranslateTransform(child);
-
                 double zoom = e.Delta > 0 ? .2 : -.2;
-                if (!(e.Delta > 0) && (st.ScaleX < .4 || st.ScaleY < .4))
-                    return;
 
-                Point relative = e.GetPosition(child);
-                double abosuluteX;
-                double abosuluteY;
-
-                abosuluteX = relative.X * st.ScaleX + tt.X;
-                abosuluteY = relative.Y * st.ScaleY + tt.Y;
-
-                st.ScaleX += zoom;
-                st.ScaleY += zoom;
-
-                tt.X = abosuluteX - relative.X * st.ScaleX;
-                tt.Y = abosuluteY - relative.Y * st.ScaleY;
+                if (zoom > 0)
+                    ScaleUp(.5);
+                if (zoom < 0)
+                    ScaleDown(.5);
             }
         }
-
-        private void child_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ZoomPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (child != null)
             {
@@ -184,8 +161,7 @@ namespace Mija_Reader.AdditionalControls
                 child.CaptureMouse();
             }
         }
-
-        private void child_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void ZoomPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (child != null)
             {
@@ -193,13 +169,7 @@ namespace Mija_Reader.AdditionalControls
                 this.Cursor = Cursors.Arrow;
             }
         }
-
-        void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Reset();
-        }
-
-        private void child_MouseMove(object sender, MouseEventArgs e)
+        private void ZoomPanel_MouseMove(object sender, MouseEventArgs e)
         {
             if (child != null)
             {
@@ -212,7 +182,10 @@ namespace Mija_Reader.AdditionalControls
                 }
             }
         }
-
+        private void ZoomPanel_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            this.Reset();
+        }
         #endregion
     }
 }

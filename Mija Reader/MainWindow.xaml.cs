@@ -184,13 +184,14 @@ namespace Mija_Reader
         {
             InitializeComponent();
             DataContext = this;
-            
+
             SourceInitialized += MainWindow_SourceInitialized;
 
             #region Shortkuts
             PreviewKeyDown += (s, e) =>
             {
                 Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
+
                 if (key.Equals(Key.F11) || (e.KeyboardDevice.Modifiers.Equals(ModifierKeys.Alt) && key.Equals(Key.Enter)))
                 {
                     if (Topmost == false)
@@ -210,7 +211,7 @@ namespace Mija_Reader
                     {
                         ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
                         MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem;
-                        if(nextmenu.IsEnabled)
+                        if (nextmenu.IsEnabled)
                             NextImage();
                     }
                 }
@@ -260,6 +261,25 @@ namespace Mija_Reader
                     {
                         CheckForNewChapters();
                     };
+                }
+            };
+            PreviewMouseWheel += (s, e) =>
+            {
+                if ((c_MainTabTC.SelectedItem as TabItem).Header.ToString() == SelectedLanguage.Reader)
+                {
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                    {
+                        tvImageViewZoomBorder.ZoomPanel_MouseWheel(s, e);
+                    }
+                    else
+                    {
+                        double zoom = e.Delta > 0 ? .2 : -.2;
+
+                        if (zoom > 0)
+                            tvImageScrool.ScrollToVerticalOffset(tvImageScrool.VerticalOffset - 10);
+                        if (zoom < 0)
+                            tvImageScrool.ScrollToVerticalOffset(tvImageScrool.VerticalOffset + 10);
+                    }
                 }
             };
             #endregion
@@ -2124,6 +2144,10 @@ namespace Mija_Reader
         {
             NextImage();
         }
+        private void tvImageScrool_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+        }
         #endregion
         private async void CheckForNewChapters()
         {
@@ -2459,7 +2483,6 @@ namespace Mija_Reader
             return parser;
         }
         #endregion
-
         #region Twitter
         private void Twitter_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -2527,22 +2550,6 @@ namespace Mija_Reader
             }
         }
         #endregion
-        private static BitmapImage LoadImage(byte[] imageData)
-        {
-            if (imageData == null || imageData.Length == 0) return null;
-            var image = new BitmapImage();
-            using (var mem = new System.IO.MemoryStream(imageData))
-            {
-                mem.Position = 0;
-                image.BeginInit();
-                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.UriSource = null;
-                image.StreamSource = mem;
-                image.EndInit();
-            }
-            image.Freeze();
-            return image;
-        }
+
     }
 }
