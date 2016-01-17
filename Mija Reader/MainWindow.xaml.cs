@@ -2127,7 +2127,7 @@ namespace Mija_Reader
         #endregion
         private async void CheckForNewChapters()
         {
-            if (ReadingData.Count > 0)
+            if (ReadingData.Count > 0 && !tvLibraryUpdateProgress.IsVisible)
             {
                 tvLibraryUpdateText.Visibility = Visibility.Visible;
                 tvLibraryUpdateProgress.Visibility = Visibility.Visible;

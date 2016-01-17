@@ -119,35 +119,25 @@ namespace MangaParser
             }
         }
 
-
         public async Task<bool> ParseSearchAsync(string SearchQuote, bool IgnorePages, int PageNumber, ObservableCollection<MangaSearchData> SearchResults)
         {
             _ErrorMessage = "";
             _Page = PageNumber;
             _SearchQuote = SearchQuote;
 
-            StringBuilder result = new StringBuilder();
+            string result = "";
 
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(SearchLink);
-                request.Credentials = CredentialCache.DefaultCredentials;
-                using (WebResponse response = await request.GetResponseAsync())
-                {
-                    using (System.IO.Stream responseStream = response.GetResponseStream())
-                    {
-                        byte[] urlContents = new byte[2048];
-                        int bytesSize = 0;
-                        while ((bytesSize = await responseStream.ReadAsync(urlContents, 0, urlContents.Length)) > 0)
-                        {
-                            result.Append(Encoding.UTF8.GetString(urlContents, 0, bytesSize));
-                        }
-                    }
-                }
+                config.HttpDownloader request = new config.HttpDownloader(SearchLink, "", "");
+                result = await request.GetPageAsync();
             }
-            catch (OperationCanceledException)
+            catch (WebException ex)
             {
-                throw;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    throw new Exception("Status Code : " + ((HttpWebResponse)ex.Response).StatusCode + " \nStatus Description : " + ((HttpWebResponse)ex.Response).StatusDescription);
+                }
             }
             catch (Exception ex)
             {
@@ -158,7 +148,7 @@ namespace MangaParser
             #region parse website
             if (result.Length > 0 && result != null)
             {
-                Regex reg = new Regex(@"<div class=""imgsearchresults"" style=""background-image:url(.*?)"">",
+                Regex reg = new Regex("<div class=\"imgsearchresults\" style=\"background-image:url(.*?)\">",
                     RegexOptions.IgnoreCase);
                 MatchCollection matches = reg.Matches(result.ToString());
 
@@ -228,27 +218,19 @@ namespace MangaParser
             string ChapterName = "";
             string RealChapterName = "";
 
-            StringBuilder result = new StringBuilder();
+            string result = "";
+
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
-                request.Credentials = CredentialCache.DefaultCredentials;
-                using (WebResponse response = await request.GetResponseAsync())
-                {
-                    using (System.IO.Stream responseStream = response.GetResponseStream())
-                    {
-                        byte[] urlContents = new byte[2048];
-                        int bytesSize = 0;
-                        while ((bytesSize = await responseStream.ReadAsync(urlContents, 0, urlContents.Length)) > 0)
-                        {
-                            result.Append(Encoding.UTF8.GetString(urlContents, 0, bytesSize));
-                        }
-                    }
-                }
+                config.HttpDownloader request = new config.HttpDownloader(URL, "", "");
+                result = await request.GetPageAsync();
             }
-            catch (OperationCanceledException)
+            catch (WebException ex)
             {
-                throw;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    throw new Exception("Status Code : " + ((HttpWebResponse)ex.Response).StatusCode + " \nStatus Description : " + ((HttpWebResponse)ex.Response).StatusDescription);
+                }
             }
             catch (Exception ex)
             {
@@ -391,27 +373,19 @@ namespace MangaParser
             data.PrewLink = "";
             data.MaxPages = 0;
 
-            StringBuilder result = new StringBuilder();
+            string result = "";
+
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
-                request.Credentials = CredentialCache.DefaultCredentials;
-                using (WebResponse response = await request.GetResponseAsync())
-                {
-                    using (System.IO.Stream responseStream = response.GetResponseStream())
-                    {
-                        byte[] downBuffer = new byte[2048];
-                        int bytesSize = 0;
-                        while ((bytesSize = await responseStream.ReadAsync(downBuffer, 0, downBuffer.Length)) > 0)
-                        {
-                            result.Append(Encoding.UTF8.GetString(downBuffer, 0, bytesSize));
-                        }
-                    }
-                }
+                config.HttpDownloader request = new config.HttpDownloader(URL, "", "");
+                result = await request.GetPageAsync();
             }
-            catch (OperationCanceledException)
+            catch (WebException ex)
             {
-                throw;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    throw new Exception("Status Code : " + ((HttpWebResponse)ex.Response).StatusCode + " \nStatus Description : " + ((HttpWebResponse)ex.Response).StatusDescription);
+                }
             }
             catch (Exception ex)
             {
