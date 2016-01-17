@@ -79,5 +79,6 @@
         public string Authorize { get { return "Autoryzuj"; } }
         public string PinCodeToConnectTwitterWithAPP { get { return "kod PIN do autoryzacji"; } }
         public string SharedWithMIJA { get { return "Udostępnione przez Mija Reader"; } }
+        public string MangaHasBeedLicensed { get { return "Manga '{0}' została zlicencjonowana i nie jest dostępna na '{1}'."; } }
     }
 }

@@ -824,6 +824,7 @@ namespace Mija_Reader
             SelectedLanguage.Authorize = c.Authorize;
             SelectedLanguage.PinCodeToConnectTwitterWithAPP = c.PinCodeToConnectTwitterWithAPP;
             SelectedLanguage.SharedWithMIJA = c.SharedWithMIJA;
+            SelectedLanguage.MangaHasBeedLicensed = c.MangaHasBeedLicensed;
 
             MyIni.Write("Language", SelectedLanguage.LanguageName, "WindowData");
         }
@@ -1506,6 +1507,20 @@ namespace Mija_Reader
                             }
                         }
 
+                    }
+                    else
+                    {
+                        // ignore displaying message when we checking for new chapters
+                        if (!tvLibraryUpdateProgress.IsVisible)
+                        {
+                            if (parser.ErrorMessage == "This manga has been licensed, it is not available here.")
+                            {
+                                MetroMessageBox mbox = new MetroMessageBox();
+                                mbox.MessageBoxBtnYes.Click += (s, en) => { mbox.Close(); };
+                                mbox.MessageBoxBtnYes.Content = SelectedLanguage.Cancel;
+                                mbox.ShowMessage(this, string.Format(SelectedLanguage.MangaHasBeedLicensed, panel.Name, parser.Website), SelectedLanguage.Information, MessageBoxMessage.information, MessageBoxButton.OK);
+                            }
+                        }
                     }
                 }
             }

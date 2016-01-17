@@ -324,7 +324,7 @@ namespace MangaParser
                 {
                     if (result.ToString().ToLower().Contains("has been licensed, it is not available in MangaHere.".ToLower()))
                     {
-                        _ErrorMessage = "This manga has been licensed, it is not available in MangaHere.";
+                        _ErrorMessage = "This manga has been licensed, it is not available here.";
                         return false;
                     }
                     else

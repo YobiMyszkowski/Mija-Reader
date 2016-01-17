@@ -472,7 +472,12 @@ namespace Mija_Reader.Core
             get { return _SharedWithMIJA; }
             set { _SharedWithMIJA = value; RaisePropertyChanged("SharedWithMIJA"); }
         }
-
+        private string _MangaHasBeedLicensed = "Manga '{0}' has been licensed and isn't available at '{1}'.";
+        public string MangaHasBeedLicensed
+        {
+            get { return _MangaHasBeedLicensed; }
+            set { _MangaHasBeedLicensed = value; RaisePropertyChanged("MangaHasBeedLicensed"); }
+        }
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
