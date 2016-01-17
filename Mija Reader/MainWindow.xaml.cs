@@ -1748,7 +1748,7 @@ namespace Mija_Reader
                         {
                             nextLink = NextReaderInfo.Last().NextLink;
 
-                            if (nextLink != null)
+                            if (nextLink != null && nextLink != "")
                             {
                                 result = await parser.ParseImagesAsync(nextLink, NextReaderInfo);
                                 if (NextReaderInfo.Last().ImageLink != "")
@@ -1803,14 +1803,16 @@ namespace Mija_Reader
                         c_MainTabTC.SelectedIndex = 4;
 
                         string nextLink = null;
-
-                        ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
+                        if (ReaderInfo.Last().ImageLink != "")
+                            ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
+                        else
+                            ImageList.Add(new BitmapImage());
 
                         for (int i = 0; i < ReaderInfo.Last().MaxPages; i++)
                         {
                             tvLoadingProgress.Value = i;
                             nextLink = ReaderInfo.Last().NextLink;
-                            if (nextLink != null)
+                            if (nextLink != null && nextLink != "")
                             {
                                 result = await parser.ParseImagesAsync(nextLink, ReaderInfo);
                                 if (ReaderInfo.Last().ImageLink != "")

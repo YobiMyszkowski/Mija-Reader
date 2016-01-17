@@ -123,28 +123,19 @@ namespace MangaParser
             _Page = PageNumber;
             _SearchQuote = SearchQuote;
 
-            StringBuilder result = new StringBuilder();
+            string result = "";
 
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(SearchLink);
-                request.Credentials = CredentialCache.DefaultCredentials;
-                using (WebResponse response = await request.GetResponseAsync())
-                {
-                    using (System.IO.Stream responseStream = response.GetResponseStream())
-                    {
-                        byte[] urlContents = new byte[2048];
-                        int bytesSize = 0;
-                        while ((bytesSize = await responseStream.ReadAsync(urlContents, 0, urlContents.Length)) > 0)
-                        {
-                            result.Append(Encoding.UTF8.GetString(urlContents, 0, bytesSize));
-                        }
-                    }
-                }
+                config.HttpDownloader request = new config.HttpDownloader(SearchLink, "", "");
+                result = await request.GetPageAsync();
             }
-            catch (OperationCanceledException)
+            catch (WebException ex)
             {
-                throw;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    throw new Exception("Status Code : " + ((HttpWebResponse)ex.Response).StatusCode + " \nStatus Description : " + ((HttpWebResponse)ex.Response).StatusDescription);
+                }
             }
             catch (Exception ex)
             {
@@ -158,36 +149,9 @@ namespace MangaParser
                     RegexOptions.IgnoreCase);
                 MatchCollection matches = reg.Matches(result.ToString());
 
-                List<string> Covers = new List<string>();
-                List<string> Names = new List<string>();
-                List<string> Websites = new List<string>();
-
-                foreach (Match match in matches)
-                {
-                    Websites.Add(match.Groups["MangaWebsite"].Value);//.Substring(Website.Length));
-                    Names.Add(match.Groups["MangaName"].Value);
-
-                    HttpWebRequest web = (HttpWebRequest)WebRequest.Create(String.Format("{0}/ajax/series.php", Website));
-                    web.Method = "POST";
-                    web.ContentType = "application/x-www-form-urlencoded";
-                    String PayloadContent = String.Format("name={0}", Uri.EscapeDataString(match.Groups["MangaName"].Value));
-                    Byte[] PayloadBuffer = Encoding.UTF8.GetBytes(PayloadContent.ToCharArray());
-                    web.ContentLength = PayloadBuffer.Length;
-                    //web.GetRequestStream().Write(PayloadBuffer, 0, PayloadBuffer.Length);
-                    web.GetRequestStreamAsync().Result.Write(PayloadBuffer, 0, PayloadBuffer.Length);
-
-                    WebResponse response = await web.GetResponseAsync();
-
-                    System.IO.Stream dataStream = response.GetResponseStream();
-                    System.IO.StreamReader reader = new System.IO.StreamReader(dataStream);
-
-                    string responseFromServer = reader.ReadToEnd();
-
-                    String[] Details = responseFromServer.Replace("\\/", "/").Split(new String[] { "\",\"" }, StringSplitOptions.None);
-                    Covers.Add(Details[1].Substring(0, Details[1].LastIndexOf('?')));
-
-                    response.Close();
-                }
+                string MangaCover = "";
+                string MangaName = "";
+                string MangaWebsite = "";
 
                 int NextPage = 0;
                 if (IgnorePages != true)
@@ -200,13 +164,37 @@ namespace MangaParser
                     else
                     {
                         NextPage = 1;
-                        //_ErrorMessage = "No Pages";
                     }
                 }
 
-                for (int i = 0; i < Covers.Count; i++)
+                foreach (Match match in matches)
                 {
-                    SearchResults.Add(new MangaSearchData() { Name = Names[i].ToString(), Image = Covers[i].ToString(), Website = Websites[i].ToString(), FirstPage = Page, NextPage = NextPage });
+                    MangaWebsite = match.Groups["MangaWebsite"].Value;
+                    MangaName = match.Groups["MangaName"].Value;
+
+                    WebRequest request = WebRequest.Create(String.Format("{0}/ajax/series.php", Website));
+                    request.ContentType = "application/x-www-form-urlencoded";
+                    request.Method = "POST";
+                    String PayloadContent = String.Format("name={0}", Uri.EscapeDataString(match.Groups["MangaName"].Value));
+                    Byte[] PayloadBuffer = Encoding.UTF8.GetBytes(PayloadContent.ToCharArray());
+                    request.ContentLength = PayloadBuffer.Length;
+                    System.IO.Stream stream = await request.GetRequestStreamAsync();
+                    await stream.WriteAsync(PayloadBuffer, 0, PayloadBuffer.Length);
+                    using (WebResponse response = await request.GetResponseAsync())
+                    {
+                        using (System.IO.Stream responseStream = response.GetResponseStream())
+                        {
+                            using (System.IO.StreamReader sr = new System.IO.StreamReader(responseStream, Encoding.UTF8, true))
+                            {
+                                string responseFromServer = sr.ReadToEnd();
+                                String[] Details = responseFromServer.Replace("\\/", "/").Split(new String[] { "\",\"" }, StringSplitOptions.None);
+
+                                MangaCover = Details[1].Substring(0, Details[1].LastIndexOf('?'));
+
+                                SearchResults.Add(new MangaSearchData() { Name = MangaName, Image = MangaCover, Website = MangaWebsite, FirstPage = Page, NextPage = NextPage });
+                            }
+                        }
+                    }
                 }
                 return true;
             }
@@ -222,31 +210,22 @@ namespace MangaParser
             string ChapterName = "";
             string RealChapterName = "";
 
-            StringBuilder result = new StringBuilder();
+            string result = "";
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
-                request.Credentials = CredentialCache.DefaultCredentials;
-                using (WebResponse response = await request.GetResponseAsync())
-                {
-                    using (System.IO.Stream responseStream = response.GetResponseStream())
-                    {
-                        byte[] urlContents = new byte[2048];
-                        int bytesSize = 0;
-                        while ((bytesSize = await responseStream.ReadAsync(urlContents, 0, urlContents.Length)) > 0)
-                        {
-                            result.Append(Encoding.UTF8.GetString(urlContents, 0, bytesSize));
-                        }
-                    }
-                }
+                config.HttpDownloader request = new config.HttpDownloader(URL, "", "");
+                result = await request.GetPageAsync();
             }
-            catch (OperationCanceledException)
+            catch (WebException ex)
             {
-                throw;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    throw new Exception("Status Code : " + ((HttpWebResponse)ex.Response).StatusCode + " \nStatus Description : " + ((HttpWebResponse)ex.Response).StatusDescription);
+                }
             }
             catch (Exception ex)
             {
-                string error = String.Format("{0} - Error - Website: {1} - Reason: {2}", DateTime.Now.ToLongTimeString(), SearchLink, ex.Message);
+                string error = String.Format("{0} - Error - Website: {1} - Reason: {2}", DateTime.Now.ToLongTimeString(), URL, ex.Message);
                 throw new Exception(error, ex);
             }
 
@@ -281,7 +260,7 @@ namespace MangaParser
                     matches = reg.Matches(result.ToString());
                     foreach (Match match in matches)
                     {
-                        data.Name = match.Groups["MangaName"].Value;
+                        data.Name = WebUtility.HtmlDecode(match.Groups["MangaName"].Value);
                         break;
                     }
                     reg = new Regex("<li><label>Alternative Name:</label>(?<MangaName>[^<]+)</li>",
@@ -289,7 +268,7 @@ namespace MangaParser
                     matches = reg.Matches(result.ToString());
                     foreach (Match match in matches)
                     {
-                        data.AlternateName = match.Groups["MangaName"].Value;
+                        data.AlternateName = WebUtility.HtmlDecode(match.Groups["MangaName"].Value);
                         break;
                     }
                     reg = new Regex("<li><label>Genre(?<Useless>[^<]+):</label>(?<MangaName>[^\"]+)</li>",
@@ -297,7 +276,7 @@ namespace MangaParser
                     matches = reg.Matches(result.ToString());
                     foreach (Match match in matches)
                     {
-                        data.Genre = match.Groups["MangaName"].Value;
+                        data.Genre = WebUtility.HtmlDecode(match.Groups["MangaName"].Value);
                         break;
                     }
                     reg = new Regex("<li><label>Author(?<Useless>[^<]+):</label><a class=\"color_0077\" href=\"(?<Useless>[^<]+)\">(?<MangaName>[^\"]+)</a></li>",
@@ -305,7 +284,7 @@ namespace MangaParser
                     matches = reg.Matches(result.ToString());
                     foreach (Match match in matches)
                     {
-                        data.Author = match.Groups["MangaName"].Value;
+                        data.Author = WebUtility.HtmlDecode(match.Groups["MangaName"].Value);
                         break;
                     }
                     reg = new Regex("<li><label>Status:</label>(?<MangaName>[^<]+)</li>",
@@ -325,7 +304,7 @@ namespace MangaParser
                     matches = reg.Matches(result.ToString());
                     foreach (Match match in matches)
                     {
-                        data.Artist = match.Groups["MangaName"].Value;
+                        data.Artist = WebUtility.HtmlDecode(match.Groups["MangaName"].Value);
                         break;
                     }
                     reg = new Regex("<p id=\"show\" style=\"display:none;\">(?<MangaName>[^\"]+)<a (?<Useless>[^<]+)>Show less</a></p>",
@@ -333,7 +312,7 @@ namespace MangaParser
                     matches = reg.Matches(result.ToString());
                     foreach (Match match in matches)
                     {
-                        data.Description = match.Groups["MangaName"].Value;
+                        data.Description = WebUtility.HtmlDecode(match.Groups["MangaName"].Value);
                         break;
                     }
 
@@ -355,10 +334,9 @@ namespace MangaParser
                         MatchCollection matches = reg.Matches(result.ToString());
                         foreach (Match match in matches)
                         {
-                            ChapterName = match.Groups["MangaChapterName"].Value.Trim();
-                            UrlToPage = match.Groups["MangaChapterLink"].Value;//.Substring(website_.Length));
-                            //string realname = match.Groups["MangaChapterNameFirstPart"].Value + " " + match.Groups["MangaChapterNameSecondPart"].Value;
-                            RealChapterName = match.Groups["MangaChapterNameFirstPart"].Value + " " + match.Groups["MangaChapterNameSecondPart"].Value;
+                            ChapterName = WebUtility.HtmlDecode(match.Groups["MangaChapterName"].Value.Trim());
+                            UrlToPage = match.Groups["MangaChapterLink"].Value;
+                            RealChapterName = WebUtility.HtmlDecode(match.Groups["MangaChapterNameFirstPart"].Value + " " + match.Groups["MangaChapterNameSecondPart"].Value);
                             ChaptersInfo.Add(new MangaPageChapters()
                             {
                                 Name = ChapterName,
@@ -369,13 +347,13 @@ namespace MangaParser
                         }
                         if (matches.Count == 0)
                         {
-                            //_ErrorMessage = "There isn't any chapters in this manga.";
+                            _ErrorMessage = "There isn't any chapters in this manga.";
                             return false;
                         }
 
                         for (int i = 0; i < ChaptersInfo.Count; i++)
                         {
-                            ChaptersInfo.Move(ChaptersInfo.Count - 1, i); //reverse list
+                            ChaptersInfo.Move(ChaptersInfo.Count - 1, i); //reverse list, since it start from end to beginning
                         }
 
                         return true;
@@ -397,94 +375,75 @@ namespace MangaParser
             data.PrewLink = "";
             data.MaxPages = 0;
 
-            StringBuilder result = new StringBuilder();
+            string result = "";
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
-                request.Credentials = CredentialCache.DefaultCredentials;
-                using (WebResponse response = await request.GetResponseAsync())
+                if (URL != "")
                 {
-                    using (System.IO.Stream responseStream = response.GetResponseStream())
-                    {
-                        byte[] downBuffer = new byte[2048];
-                        int bytesSize = 0;
-                        while ((bytesSize = await responseStream.ReadAsync(downBuffer, 0, downBuffer.Length)) > 0)
-                        {
-                            result.Append(Encoding.UTF8.GetString(downBuffer, 0, bytesSize));
-                        }
-                    }
+                    config.HttpDownloader request = new config.HttpDownloader(URL, "", "");
+                    result = await request.GetPageAsync();
                 }
             }
-            catch (OperationCanceledException)
+            catch (WebException ex)
             {
-                throw;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    throw new Exception("Status Code : " + ((HttpWebResponse)ex.Response).StatusCode + " \nStatus Description : " + ((HttpWebResponse)ex.Response).StatusDescription);
+                }
             }
             catch (Exception ex)
             {
-                string error = String.Format("{0} - Error - Website: {1} - Reason: {2}", DateTime.Now.ToLongTimeString(), SearchLink, ex.Message);
-                throw new Exception(error, ex);
+                throw new Exception(ex.Message, ex);
             }
 
             if (result.Length > 0 && result != null)
             {
-                Match match = Regex.Match(result.ToString(), "<img src=\"(?<ImageLink>[^\"]+)\" (?<Useless>[^<]+) />");
+                Match match = Regex.Match(result, "<img src=\"(?<ImageLink>[^\"]+)\" (?<Useless>[^<]+) />");
                 if (match.Success)
                 {
                     data.ImageLink = match.Groups["ImageLink"].Value;
-
                 }
-
-                match = Regex.Match(result.ToString(), "<select class=\"wid60\" onchange=\"(?<Useless>[^<]+)\">(.*?)</select>", RegexOptions.Multiline | RegexOptions.Singleline);
+                match = Regex.Match(result, @"<select class=""(.*?)"" onchange=""(.*?)"">(?<Content>.*?)</select>", RegexOptions.Singleline);
                 if (match.Success)
                 {
-                    match = Regex.Match(match.Groups[1].Value, @"<option value=""(.*?)""(.*?)>(.*?)</option>", RegexOptions.Singleline);
-                    Match nextMatch = null;
-                    Match prevMatch = null;
-                    while (match.Success)
+                    string textToParse = match.Groups["Content"].Value;
+
+                    MatchCollection matches = Regex.Matches(textToParse, @"<option value=""(.*?)""(?<Selected>.*?)>(.*?)</option>", RegexOptions.IgnoreCase);
+                    if (matches.Count > 0)
                     {
-                        if (match.Groups[2].Value == @" selected=""selected""" | match.Groups[2].Value == @"selected=""selected""")
-                        {
-                            data.PageNumber = UInt32.Parse(match.Groups[3].Value);
-                            data.PageLink = match.Groups[1].Value;
-
-                            nextMatch = match.NextMatch();
-                        }
-
-                        if (nextMatch == null)
-                        {
-                            prevMatch = match;
-                        }
-
-                        data.MaxPages = UInt32.Parse(match.Groups[3].Value);
-
-                        match = match.NextMatch();
-                        if (match.Index == 0)
-                        {
-                            break;
-                        }
+                        data.MaxPages = (UInt32)matches.Count;
                     }
-                    if (nextMatch.Index != 0)
+                    match = Regex.Match(textToParse, "<option value=\"(?<Url>[^\"]+)\" selected=\"selected\">(.*?)</option>", RegexOptions.IgnoreCase);
+                    if (match.Success)
                     {
-                        data.NextLink = nextMatch.Groups[1].Value;
+                        data.PageNumber = UInt32.Parse(match.Groups[1].Value);
+                        data.PageLink = match.Groups["Url"].Value;
                     }
-                    else
+
+                    match = Regex.Match(result, "<a href=\"(?<PrevLink>[^\"]+)\" class=\"prew_page\">", RegexOptions.IgnoreCase);
+                    if (match.Success)
                     {
-                        data.NextLink = null;
-                    }
-                    if (prevMatch != null)
-                    {
-                        if (prevMatch.Index != 0)
+                        if (!match.Groups["PrevLink"].Value.Contains("javascript:void(0)"))
                         {
-                            data.PrewLink = prevMatch.Groups[1].Value;
+                            data.PrewLink = match.Groups["PrevLink"].Value;
                         }
                         else
                         {
                             data.PrewLink = null;
                         }
                     }
-                    else
+
+                    match = Regex.Match(result, "<a href=\"(?<NextLink>[^\"]+)\" class=\"next_page\">", RegexOptions.IgnoreCase);
+                    if (match.Success)
                     {
-                        data.PrewLink = null;
+                        if (!match.Groups["NextLink"].Value.Contains("javascript:void(0)"))
+                        {
+                            data.NextLink = match.Groups["NextLink"].Value;
+                        }
+                        else
+                        {
+                            data.NextLink = null;
+                        }
                     }
 
                     ReaderInfo.Add(data);
@@ -492,12 +451,12 @@ namespace MangaParser
                 }
                 else
                 {
-                    //_ErrorMessage = "Nothing was found"; 
+                    _ErrorMessage = "Nothing was found";
                     return false;
                 }
+
             }
             return false;
         }
     }
-
 }
