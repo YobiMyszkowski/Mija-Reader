@@ -1726,160 +1726,180 @@ namespace Mija_Reader
         {
             if (parser.LoadImagesFromOnePage)
             {
-
+                parser.Page = 0;
+            }
+            BaseMangaSource.MangaPageChapters item = null;
+            string ChapterDisplayDirection = null;
+            if (MyIni.KeyExists("ChapterDisplayDirection", "WindowData") == true)
+            {
+                ChapterDisplayDirection = MyIni.Read("ChapterDisplayDirection", "WindowData");
             }
             else
             {
-                BaseMangaSource.MangaPageChapters item = null;
-                string ChapterDisplayDirection = null;
-                if (MyIni.KeyExists("ChapterDisplayDirection", "WindowData") == true)
-                {
-                    ChapterDisplayDirection = MyIni.Read("ChapterDisplayDirection", "WindowData");
-                }
-                else
-                {
-                    ChapterDisplayDirection = "Start";
-                }
+                ChapterDisplayDirection = "Start";
+            }
 
-                if (ChapterDisplayDirection == "Start")
+            if (ChapterDisplayDirection == "Start")
+            {
+                if (ChaptersInfo.IndexOf(tvChaptersList.SelectedItem as BaseMangaSource.MangaPageChapters) < ChaptersInfo.Count - 1)
                 {
-                    if (ChaptersInfo.IndexOf(tvChaptersList.SelectedItem as BaseMangaSource.MangaPageChapters) < ChaptersInfo.Count - 1)
-                    {
-                        item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex + 1);
-                    }
-                    else
-                    {
-                        NextChapterImageList.Clear();
-                        return;
-                    }
+                    item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex + 1);
                 }
                 else
-                {
-                    if (((ChaptersInfo.Count - 1) - tvChaptersList.SelectedIndex) < ChaptersInfo.Count - 1)
-                    {
-                        item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex - 1);
-                    }
-                    else
-                    {
-                        NextChapterImageList.Clear();
-                        return;
-                    }
-                }
-                if (item != null)
                 {
                     NextChapterImageList.Clear();
-                    NextReaderInfo.Clear();
-                    bool result = await parser.ParseImagesAsync(item.UrlToPage, NextReaderInfo);
+                    return;
+                }
+            }
+            else
+            {
+                if (((ChaptersInfo.Count - 1) - tvChaptersList.SelectedIndex) < ChaptersInfo.Count - 1)
+                {
+                    item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex - 1);
+                }
+                else
+                {
+                    NextChapterImageList.Clear();
+                    return;
+                }
+            }
+            if (item != null)
+            {
+                NextChapterImageList.Clear();
+                NextReaderInfo.Clear();
+                bool result = await parser.ParseImagesAsync(item.UrlToPage, NextReaderInfo);
 
-                    if (result == true)
+                if (result == true)
+                {
+                    string nextLink = null;
+
+                    nextLink = null;
+
+                    NextChapterImageList.Add(new BitmapImage(new Uri(NextReaderInfo.Last().ImageLink)));
+
+                    for (int i = 0; i < NextReaderInfo.Last().MaxPages; i++)
                     {
-                        string nextLink = null;
-
-                        nextLink = null;
-
-                        NextChapterImageList.Add(new BitmapImage(new Uri(NextReaderInfo.Last().ImageLink)));
-
-                        for (int i = 0; i < NextReaderInfo.Last().MaxPages; i++)
+                        if (parser.LoadImagesFromOnePage)
                         {
-                            nextLink = NextReaderInfo.Last().NextLink;
-
-                            if (nextLink != null && nextLink != "")
+                            if (parser.Page < ReaderInfo.Last().MaxPages)
                             {
-                                result = await parser.ParseImagesAsync(nextLink, NextReaderInfo);
-                                if (NextReaderInfo.Last().ImageLink != "")
-                                    NextChapterImageList.Add(new BitmapImage(new Uri(NextReaderInfo.Last().ImageLink)));
-                                else
-                                    NextChapterImageList.Add(new BitmapImage());
+                                parser.Page += 1;
                             }
                             else
                             {
+                                parser.Page = 0;
+                                nextLink = "";
                             }
+                        }
+                        nextLink = NextReaderInfo.Last().NextLink;
+
+                        if (nextLink != null && nextLink != "")
+                        {
+                            result = await parser.ParseImagesAsync(nextLink, NextReaderInfo);
+                            if (NextReaderInfo.Last().ImageLink != "")
+                                NextChapterImageList.Add(new BitmapImage(new Uri(NextReaderInfo.Last().ImageLink)));
+                            else
+                                NextChapterImageList.Add(new BitmapImage());
+                        }
+                        else
+                        {
                         }
                     }
                 }
-            }
+            }     
         }
         private async void MenuItem_Click_ViewOnline(object sender, RoutedEventArgs e)
         {
             if (parser.LoadImagesFromOnePage)
             {
+                parser.Page = 0;
             }
-            else
+            BaseMangaSource.MangaPageChapters item = null;
+            if (tvChaptersList.SelectedItem != null)
+                item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
+
+            if (item != null)
             {
-                BaseMangaSource.MangaPageChapters item = null;
-                if (tvChaptersList.SelectedItem != null)
-                    item = ChaptersInfo.ElementAt(tvChaptersList.SelectedIndex);
+                tvImageView.Source = null;
+                ImageList.Clear();
+                NextChapterImageList.Clear();
+                ReaderInfo.Clear();
 
-                if (item != null)
+                bool result = await parser.ParseImagesAsync(item.UrlToPage, ReaderInfo);
+
+                if (result == true)
                 {
-                    tvImageView.Source = null;
-                    ImageList.Clear();
-                    NextChapterImageList.Clear();
-                    ReaderInfo.Clear();
+                    SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", item.Name, 1, ReaderInfo.Last().MaxPages);
 
-                    bool result = await parser.ParseImagesAsync(item.UrlToPage, ReaderInfo);
+                    tvImageScrool.ScrollToTop();
 
-                    if (result == true)
+                    tvLoadingProgress.Visibility = Visibility.Visible;
+                    tvLoadingText.Visibility = Visibility.Visible;
+                    tvLoadingProgress.Minimum = 1;
+                    tvLoadingProgress.Maximum = ReaderInfo.Last().MaxPages;
+
+                    for (int i = 0; i < c_MainTabTC.Items.Count; i++)
                     {
-                        SelectedLanguage.WindowTitle = string.Format("'{0}'-Page: {1}/{2}", item.Name, 1, ReaderInfo.Last().MaxPages);
+                        (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
+                    }
+                    (c_MainTabTC.Items[4] as TabItem).IsEnabled = true;
+                    c_MainTabTC.SelectedIndex = 4;
 
-                        tvImageScrool.ScrollToTop();
+                    string nextLink = null;
+                    if (ReaderInfo.Last().ImageLink != "")
+                        ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
+                    else
+                        ImageList.Add(new BitmapImage());
 
-                        tvLoadingProgress.Visibility = Visibility.Visible;
-                        tvLoadingText.Visibility = Visibility.Visible;
-                        tvLoadingProgress.Minimum = 1;
-                        tvLoadingProgress.Maximum = ReaderInfo.Last().MaxPages;
-
-                        for (int i = 0; i < c_MainTabTC.Items.Count; i++)
+                    for (int i = 0; i < ReaderInfo.Last().MaxPages; i++)
+                    {
+                        if (parser.LoadImagesFromOnePage)
                         {
-                            (c_MainTabTC.Items[i] as TabItem).IsEnabled = false;
-                        }
-                        (c_MainTabTC.Items[4] as TabItem).IsEnabled = true;
-                        c_MainTabTC.SelectedIndex = 4;
-
-                        string nextLink = null;
-                        if (ReaderInfo.Last().ImageLink != "")
-                            ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
-                        else
-                            ImageList.Add(new BitmapImage());
-
-                        for (int i = 0; i < ReaderInfo.Last().MaxPages; i++)
-                        {
-                            tvLoadingProgress.Value = i;
-                            nextLink = ReaderInfo.Last().NextLink;
-                            if (nextLink != null && nextLink != "")
+                            
+                            if (parser.Page < ReaderInfo.Last().MaxPages)
                             {
-                                result = await parser.ParseImagesAsync(nextLink, ReaderInfo);
-                                if (ReaderInfo.Last().ImageLink != "")
-                                    ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
-                                else
-                                    ImageList.Add(new BitmapImage());
+                                parser.Page += 1;
                             }
                             else
                             {
-                                tvLoadingProgress.Visibility = Visibility.Collapsed;
-                                tvLoadingText.Visibility = Visibility.Collapsed;
-                                tvLoadingProgress.Value = 1;
-                                tvImageView.Source = ImageList[0];
-                                tvImageScrool.ScrollToTop();
-                                tvImageList.SelectedIndex = 0;
-                                tvLoadingProgress.Visibility = Visibility.Collapsed;
+                                parser.Page = 0;
+                                nextLink = "";
+                            }                        
+                        }
+                        tvLoadingProgress.Value = i;
+                        nextLink = ReaderInfo.Last().NextLink;
+                        if (nextLink != null && nextLink != "")
+                        {
+                            result = await parser.ParseImagesAsync(nextLink, ReaderInfo);
+                            if (ReaderInfo.Last().ImageLink != "")
+                                ImageList.Add(new BitmapImage(new Uri(ReaderInfo.Last().ImageLink)));
+                            else
+                                ImageList.Add(new BitmapImage());
+                        }
+                        else
+                        {
+                            tvLoadingProgress.Visibility = Visibility.Collapsed;
+                            tvLoadingText.Visibility = Visibility.Collapsed;
+                            tvLoadingProgress.Value = 1;
+                            tvImageView.Source = ImageList[0];
+                            tvImageScrool.ScrollToTop();
+                            tvImageList.SelectedIndex = 0;
+                            tvLoadingProgress.Visibility = Visibility.Collapsed;
 
-                                ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
-                                MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
-                                nextmenu.IsEnabled = true;
+                            ContextMenu menu = tvImageView.Resources["MainCM"] as System.Windows.Controls.ContextMenu;
+                            MenuItem nextmenu = menu.Items.GetItemAt(2) as MenuItem; // next
+                            nextmenu.IsEnabled = true;
 
-                                LoadNextChapterIfExist();
+                            LoadNextChapterIfExist();
 
-                                return;
-                            }
+                            return;
                         }
                     }
-                    else
-                    {
-                    }
                 }
-            }
+                else
+                {
+                }
+            }      
         }
         private void tvImageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

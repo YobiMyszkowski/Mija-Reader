@@ -168,8 +168,6 @@ namespace BaseMangaSource
         public string PrewLink { get { return _PrewLink; } set { if (_PrewLink != value) { _PrewLink = value; RaisePropertyChanged("PrewLink"); } } } // previous page link
         private uint _MaxPages;
         public uint MaxPages { get { return _MaxPages; } set { if (_MaxPages != value) { _MaxPages = value; RaisePropertyChanged("MaxPages"); } } } // max pages number
-        private List<string> _Covers = new List<string>();
-        public List<string> Covers { get { return _Covers; } set { if (_Covers != value) { _Covers = value; RaisePropertyChanged("Covers"); } } } // list off all images/work only LoadImagesFromOnePage=true
         private string _ErrorMessage;
         public string ErrorMessage { get { return _ErrorMessage; } set { if (_ErrorMessage != value) { _ErrorMessage = value; RaisePropertyChanged("ErrorMessage"); } } } // previous page link
 
