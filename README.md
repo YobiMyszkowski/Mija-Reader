@@ -3,7 +3,7 @@
 That gonna be my own <b>manga/manhwa/manhua reader</b>.
 <br><b>Available Features</b>:
 <br><li>language system (atm only 2 plugins english language and polish)
-<br><li>multiple manga sources without need to redownload program after new source available (mangareader.net, mangapanda.com, mangahere.co, goodmanga.net, more incomeing)
+<br><li>multiple manga sources without need to redownload program after new source available (mangareader.net, mangapanda.com, mangahere.co, goodmanga.net, senmanga.com, more incomeing)
 <br><li>search system (search manga via quote)
 <br><li>viewing details about selected manga
 <br><li>adding manga to library
@@ -20,8 +20,8 @@ That gonna be my own <b>manga/manhwa/manhua reader</b>.
 <br><b>Hotkeys</b>:
 <br>
 <br><li>ctrl+add = zoom up; ctrl+subtract = zoom down; ctrl+space = reset zoom and panning; left mouse click and move (drag) = panning
-<br><li>ctrl+mouse wheel = zoom up/down, mouse wheel = scrool up/down
-<br><li>arrows navigating in Reader: right = next page; left = previous page; down = scrool down; up = scrool up
+<br><li>ctrl+mouse wheel = zoom up/down, mouse wheel = scroll up/down
+<br><li>arrows navigating in Reader: right = next page; left = previous page; down = scroll down; up = scroll up
 <br><li>F11 or alt+enter = maximize/restore
 <br><li>F5 check for new chapters (working only when you are in Library->Reading tab)
 
