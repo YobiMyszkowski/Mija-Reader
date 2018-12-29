@@ -513,43 +513,44 @@ namespace Mija_Reader
                 if (MyIni.Read("SyncSerwer", "WindowData") == "www.dropbox.com")
                 {
                     loginServer.SelectedIndex = 0;
-                    if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
-                    {
-                        loginSyncLibrary.IsEnabled = true;
-                        try
-                        {
-                            _client = new DropNetClient(_apiKey, _appsecret);
+                    /* if (MyIni.KeyExists("accessToken", "DropBox") && MyIni.KeyExists("accessSecret", "DropBox"))
+                     {
+                             loginSyncLibrary.IsEnabled = true;
+                             try
+                             {
+                                 _client = new DropNetClient(_apiKey, _appsecret);
 
-                            _client.UserLogin = new DropNet.Models.UserLogin { Token = MyIni.Read("accessToken", "DropBox"), Secret = MyIni.Read("accessSecret", "DropBox") };
+                                 _client.UserLogin = new DropNet.Models.UserLogin { Token = MyIni.Read("accessToken", "DropBox"), Secret = MyIni.Read("accessSecret", "DropBox") };
 
-                            loginSyncLibrary.IsEnabled = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new Exception(ex.Message);
-                        }
-                    }
-                    else
-                    {
-                        loginSyncLibrary.IsEnabled = false;
-                        try
-                        {
-                            _client = new DropNetClient(_apiKey, _appsecret);
-                            _client.GetToken();
-                            
-                            var url = _client.BuildAuthorizeUrl();
+                                 loginSyncLibrary.IsEnabled = true;
+                             }
+                             catch (Exception ex)
+                             {
+                                 throw new Exception(ex.Message);
+                             }
+                         }
+                         else
+                         {
+                             loginSyncLibrary.IsEnabled = false;
+                             try
+                             {
+                                 _client = new DropNetClient(_apiKey, _appsecret);
+                                 _client.GetToken();
 
-                            loginBrowser.Navigate(url);
-                            loginBrowser.LoadCompleted += Browser_DropBoxLoadCompleted;
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new Exception(ex.Message);
-                        }
-                    }
+                                 var url = _client.BuildAuthorizeUrl();
+
+                                 loginBrowser.Navigate(url);
+                                 loginBrowser.LoadCompleted += Browser_DropBoxLoadCompleted;
+                             }
+                             catch (Exception ex)
+                             {
+                                 throw new Exception(ex.Message);
+                             }
+                         }
+                }*/
                 }
                 #endregion
-                else if(MyIni.Read("SyncSerwer", "WindowData") == "www.googledrive.com")
+                else if (MyIni.Read("SyncSerwer", "WindowData") == "www.googledrive.com")
                 {
                 }
                 else

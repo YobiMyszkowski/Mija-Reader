@@ -172,7 +172,7 @@ namespace MangaParser
                     }
                 }
 
-                Regex reg = new Regex("<a href=\"(.*?)\"><img src=\"(.*?)\" width=\"(.*?)\" height=\"(.*?)\" alt=\"(.*?)\"/></a>", RegexOptions.IgnoreCase);
+                Regex reg = new Regex("<a href=\"(.*?)\"><img src=\"(.*?)\" width=\"(.*?)\" height=\"(.*?)\" alt=\"(.*?)\" /></a>", RegexOptions.IgnoreCase);
                 MatchCollection matches = reg.Matches(result.ToString());
 
                 string MangaCover = "";
@@ -235,7 +235,7 @@ namespace MangaParser
                     data.UrlToMainpage = Website;
                     data.UnreadChapters = 0;
 
-                    Regex reg = new Regex("<img src=\"(?<MangaImage>[^\"]+)\" id=\"series_image\" width=\"(?<Useless>[^<]+)\" height=\"(?<Useless>[^<]+)\" alt=\"(?<MangaName>[^\"]+)\"/>", RegexOptions.IgnoreCase);
+                    Regex reg = new Regex("<img src=\"(?<MangaImage>[^\"]+)\" id=\"series_image\" width=\"(?<Useless>[^<]+)\" height=\"(?<Useless>[^<]+)\" alt=\"(?<MangaName>[^\"]+)\" />", RegexOptions.IgnoreCase);
                     MatchCollection matches = reg.Matches(result.ToString());
                     foreach (Match match in matches)
                     {

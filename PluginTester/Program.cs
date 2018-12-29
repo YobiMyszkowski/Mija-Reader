@@ -21,17 +21,17 @@ public class Parser : IPlugin
     {
         get
         {
-            return "My Manga Online";
+            return "Good Manga";
         }
     }
     public string Icon
     {
         get
         {
-            return "http://www.mymangaonline.com/images/icon/favicon.ico";
+            return "http://www.goodmanga.net/favicon.gif";
         }
     }
-    private string _Website = "http://mymangaonline.net";
+    private string _Website = "http://www.goodmanga.net";
     public string Website
     {
         get
@@ -69,10 +69,10 @@ public class Parser : IPlugin
     {
         get
         {
-            return 0;
+            return 1;
         }
     }
-    private int _Page = 0;
+    private int _Page = 1;
     public int Page
     {
         get
@@ -102,11 +102,11 @@ public class Parser : IPlugin
     {
         get
         {
-            return string.Format("{0}/search?keyword={1}&page={2}",
+            return string.Format("{0}/advanced-search?key={1}&page={2}",
                 Website, SearchQuote, Page);
         }
     }
-    private bool _LoadImagesFromOnePage = true;
+    private bool _LoadImagesFromOnePage = false;
     public bool LoadImagesFromOnePage
     {
         get
@@ -125,6 +125,9 @@ public class Parser : IPlugin
         _ErrorMessage = "";
         _Page = PageNumber;
         _SearchQuote = SearchQuote;
+
+        if (PageNumber == 0)
+            _Page = 1;
 
         string result = "";
         try
@@ -145,44 +148,33 @@ public class Parser : IPlugin
             throw new Exception(error, ex);
         }
 
-        #region parse website
         if (result.Length > 0 && result != null)
         {
-            int NextPage = 0;
+            int NextPage = 1;
             int PrevPage = 0;
             if (IgnorePages != true)
             {
-                Match match = Regex.Match(result.ToString(), "<ul class=\"pagination-list\" id=\"yw0\">((.|\n)*?)</ul>", RegexOptions.IgnoreCase);
+                Match match = Regex.Match(result.ToString(), "<li><a href=\"(?<MangaWebsite>[^\"]+)\">Next</a></li>", RegexOptions.IgnoreCase);
                 if (match.Success)
                 {
-                    string mangaPageString = match.Groups["1"].Value;
-                    match = Regex.Match(mangaPageString, "<li class=\"previous\"><a href=\"(.*?)\">&lt; Previous</a></li>");
-                    while (match.Success)
-                    {
-                        bool convertResult = Int32.TryParse(match.Groups[1].Value.Split('=').Last(), out PrevPage);
-
-                        if (!convertResult)
-                            PrevPage = 0;
-
-                        match = match.NextMatch();
-                        if (match.Index == 0)
-                            break;
-                    }
-                    match = Regex.Match(mangaPageString, "<li class=\"next\"><a href=\"(.*?)\">Next &gt;</a></li>");
-                    while (match.Success)
-                    {
-                        bool convertResult = Int32.TryParse(match.Groups[1].Value.Split('=').Last(), out NextPage);
-                        if (!convertResult)
-                            NextPage = 0;
-
-                        match = match.NextMatch();
-                        if (match.Index == 0)
-                            break;
-                    }
+                    NextPage = Convert.ToInt32(match.Groups["MangaWebsite"].Value.Split('=').Last());
+                }
+                else
+                {
+                    NextPage = 1;
+                }
+                match = Regex.Match(result.ToString(), "<li><a href=\"(?<MangaWebsite>[^\"]+)\">Prev</a></li>", RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    PrevPage = Convert.ToInt32(match.Groups["MangaWebsite"].Value.Split('=').Last());
+                }
+                else
+                {
+                    PrevPage = 1;
                 }
             }
 
-            Regex reg = new Regex("<div class=\"box-item(?<Useless>[^<]+)\">(?<Useless>[^<]+)<a href=\"(.*?)\" class=\"image\">(?<Useless>[^<]+)<img class=\"loadanime\" width=\"150\" heigh=\"148\" alt=\"(.*?)\" src=\"(.*?)\" />", RegexOptions.IgnoreCase & RegexOptions.Multiline);
+            Regex reg = new Regex("<a href=\"(.*?)\"><img src=\"(.*?)\" width=\"(.*?)\" height=\"(.*?)\" alt=\"(.*?)\" /></a>", RegexOptions.IgnoreCase);
             MatchCollection matches = reg.Matches(result.ToString());
 
             string MangaCover = "";
@@ -191,9 +183,10 @@ public class Parser : IPlugin
 
             foreach (Match match in matches)
             {
-                MangaCover = match.Groups[3].Value;
-                MangaName = WebUtility.HtmlDecode(match.Groups[2].Value);
-                MangaWebsite = Website + match.Groups[1].Value;
+                 MangaCover = match.Groups[2].Value;
+                 MangaWebsite = match.Groups[1].Value;
+                 MangaName = WebUtility.HtmlDecode(match.Groups[5].Value.Substring("Read ".Length).Replace(" online", ""));
+
                 SearchResults.Add(new MangaSearchData() { Name = MangaName, Image = MangaCover, Website = MangaWebsite, FirstPage = Page, NextPage = NextPage, PrevPage = PrevPage });
             }
             return true;
@@ -203,14 +196,10 @@ public class Parser : IPlugin
             _ErrorMessage = "Can't load website content.";
             return false;
         }
-        #endregion
     }
     public async Task<bool> ParseSelectedPageAsync(string URL, bool ParseJustChapters, ObservableCollection<MangaPageData> DetailedInfo, ObservableCollection<MangaPageChapters> ChaptersInfo)
     {
-        string UrlToPage = "";
-        string ChapterName = "";
-        string RealChapterName = "";
-
+    up:
         string result = "";
         try
         {
@@ -248,108 +237,119 @@ public class Parser : IPlugin
                 data.UrlToMainpage = Website;
                 data.UnreadChapters = 0;
 
-                Match match = Regex.Match(result.ToString(), "<div class=\"info\">((.|\n)*?)<div class=\"clearfix\">", RegexOptions.IgnoreCase);
-                while (match.Success)
+                Regex reg = new Regex("<img src=\"(?<MangaImage>[^\"]+)\" id=\"series_image\" width=\"(?<Useless>[^<]+)\" height=\"(?<Useless>[^<]+)\" alt=\"(?<MangaName>[^\"]+)\" />", RegexOptions.IgnoreCase);
+                MatchCollection matches = reg.Matches(result.ToString());
+                foreach (Match match in matches)
                 {
-                    string mangaPageString = match.Groups[1].Value;
-                    match = Regex.Match(mangaPageString, "<h1>(.*?)</h1>");
-                    while (match.Success)
-                    {
-                        data.Name = WebUtility.HtmlDecode(match.Groups[1].Value);
-                        break;
-                    }
-                    match = Regex.Match(mangaPageString, "div class=\"other_name fields\"><span>Other Name : </span>(.*?)</div>");
-                    while (match.Success)
-                    {
-                        data.AlternateName = WebUtility.HtmlDecode(match.Groups[1].Value);
-                        break;
-                    }
-                    match = Regex.Match(mangaPageString, "<img src=\"(.*?)\" />");
-                    while (match.Success)
-                    {
-                        data.Image = match.Groups[1].Value;
-                        break;
-                    }
-                    match = Regex.Match(mangaPageString, "<span>Year of release : </span>(.*?)</div>");
-                    while (match.Success)
-                    {
-                        data.YearOfRelease = match.Groups[1].Value;
-                        break;
-                    }
-                    match = Regex.Match(mangaPageString, "<span>Status : </span><a href=\"(.*?)\" >");
-                    while (match.Success)
-                    {
-                        if (match.Groups[1].Value.Split('/').Last().ToString() == "Completed")
-                            data.Status = MangaStatus.Completed;
-                        else
-                            data.Status = MangaStatus.Ongoing;
-                        break;
-                    }
-                    match = Regex.Match(mangaPageString, "<span>Author : </span>(.*?)</div>");
-                    while (match.Success)
-                    {
-                        data.Author = WebUtility.HtmlDecode(match.Groups[1].Value);
-                        data.Artist = WebUtility.HtmlDecode(match.Groups[1].Value);
-                        break;
-                    }
-                    data.Type = MangaType.Manga_RightToLeft;
-
-                    match = Regex.Match(result.ToString(), "<meta name=\"description\" content=\"((.|\n)*?)\" />");
-                    while (match.Success)
-                    {
-                        data.Description = WebUtility.HtmlDecode(match.Groups[1].Value);
-                        break;
-                    }
-                    Regex reg = new Regex("<a href=\'(.*?)\' title=\'(.*?)\'>(.*?)</a>",
-                            RegexOptions.IgnoreCase);
-                    MatchCollection matches = reg.Matches(mangaPageString);
-                    StringBuilder sb = new StringBuilder();
-                    foreach (Match matchGenre in matches)
-                    {
-                        sb.Append(WebUtility.HtmlDecode(matchGenre.Groups[2].Value));
-                        sb.Append(", ");
-                    }
-                    data.Genre = sb.ToString();
-
-                    DetailedInfo.Add(data);
-
-                    return true;
+                    data.Name = WebUtility.HtmlDecode(match.Groups["MangaName"].Value.Substring("Read ".Length).Replace(" manga online", ""));
+                    data.Image = match.Groups["MangaImage"].Value;
+                    break;
                 }
+                reg = new Regex("<span>Alternative Titles: </span>(?<MangaAlternativeTitles>[^<]+)</div>", RegexOptions.IgnoreCase);
+                matches = reg.Matches(result.ToString());
+                foreach (Match match in matches)
+                {
+                    data.AlternateName = WebUtility.HtmlDecode(match.Groups["MangaAlternativeTitles"].Value.Trim());
+                    break;
+                }
+                reg = new Regex("<span>Authors:</span>(?<MangaAuthor>[^<]+)</div>", RegexOptions.IgnoreCase);
+                matches = reg.Matches(result.ToString());
+                foreach (Match match in matches)
+                {
+                    data.Author = WebUtility.HtmlDecode(match.Groups["MangaAuthor"].Value.Trim());
+                    data.Artist = WebUtility.HtmlDecode(match.Groups["MangaAuthor"].Value.Trim());
+                    break;
+                }
+                reg = new Regex("<span id=\"full_notes\">(?<MangaDescription>[^<]+)</span>");
+                Match DescriptionMatch = reg.Match(result.ToString());
+                if (DescriptionMatch.Success)
+                {
+                    data.Description = WebUtility.HtmlDecode(DescriptionMatch.Groups["MangaDescription"].Value.Trim().Replace("<a href=\"#\">less</a>", ""));
+                }
+                else
+                {
+                    reg = new Regex("<span>Synopsis:</span>(?<Useless>[^<]+)<div>(?<MangaDescription>[^<]+)</div>", RegexOptions.IgnoreCase);
+                    Match match = reg.Match(result.ToString());
+                    if (match.Success)
+                    {
+                        data.Description = WebUtility.HtmlDecode(match.Groups["MangaDescription"].Value.Trim());
+                    }
+                }
+                reg = new Regex("<span>Status:</span>(?<MangaStatus>[^<]+)</div>", RegexOptions.IgnoreCase);
+                matches = reg.Matches(result.ToString());
+                foreach (Match match in matches)
+                {
+                    if (match.Groups["MangaStatus"].Value.Trim() == "Ongoing")
+                    {
+                        data.Status = MangaStatus.Ongoing;
+                        break;
+                    }
+                    else
+                    {
+                        data.Status = MangaStatus.Completed;
+                        break;
+                    }
+                }
+                reg = new Regex("<span>Released:</span>(?<MangaReleased>[^<]+)</div>", RegexOptions.IgnoreCase);
+                matches = reg.Matches(result.ToString());
+                foreach (Match match in matches)
+                {
+                    data.YearOfRelease = match.Groups["MangaReleased"].Value.Trim();
+                    break;
+                }
+                reg = new Regex("<span class=\"red_box\"><a href=\"(?<Useless>[^<]+)\">(?<MangaGenre>[^<]+)</a></span>", RegexOptions.IgnoreCase);
+                matches = reg.Matches(result.ToString());
+                StringBuilder sb = new StringBuilder();
+                foreach (Match match in matches)
+                {
+                    sb.Append(WebUtility.HtmlDecode(match.Groups["MangaGenre"].Value.Trim()));
+                    sb.Append(", ");
+                }
+                data.Genre = sb.ToString();
 
+                DetailedInfo.Add(data);
+
+                return true;
             }
             else
             {
-                Regex reg = new Regex("<div class=\"item-chapter\">(?<Useless>[^<]+)<a href=\"(.*?)\"(?<Useless>[^<]+)title=\"(.*?)\">((.|\n)*?)</a>",
-                    RegexOptions.IgnoreCase);
+                Regex reg = new Regex("<li>(?<Useless>[^<]+)<a href=\"(?<MangaChapterLink>[^<]+)\">(?<MangaChapterName>[^<]+)</a>(?<Useless>[^<]+)<span class=\"right_text\">(?<Useless>[^<]+)</span>(?<Useless>[^<]+)</li>", RegexOptions.IgnoreCase);
                 MatchCollection matches = reg.Matches(result.ToString());
-
                 foreach (Match match in matches)
                 {
-                    UrlToPage = Website + match.Groups[1].Value;
-                    ChapterName = WebUtility.HtmlDecode(match.Groups[2].Value);
-                    RealChapterName = WebUtility.HtmlDecode(match.Groups[3].Value.Trim());
-
                     ChaptersInfo.Add(new MangaPageChapters()
                     {
-                        Name = ChapterName,
-                        RealName = RealChapterName,
-                        UrlToPage = UrlToPage,
-                        Foreground = Brushes.Black
+                        Name = WebUtility.HtmlDecode(match.Groups["MangaChapterName"].Value.Trim()),
+                        RealName = "",
+                        UrlToPage = match.Groups["MangaChapterLink"].Value,
+                        Foreground = Brushes.White
                     });
                 }
-
                 if (matches.Count == 0)
                 {
-                    // data.ErrorMessage = "There isn't any chapters in this manga.";
-                    return false;
+                    //data.ErrorMessage = "There isn't any chapters in this manga.";
                 }
+                reg = new Regex("<a href=\"(?<MangaChapterNextPage>[^<]+)\">Next</a>", RegexOptions.IgnoreCase);
+                matches = reg.Matches(result.ToString());
+                foreach (Match match in matches)
+                {
+                    URL = match.Groups["MangaChapterNextPage"].Value;
+                    goto up;
+                }
+
+                for (int i = 0; i < ChaptersInfo.Count; i++)
+                {
+                    ChaptersInfo.Move(ChaptersInfo.Count - 1, i); //reverse list
+                }
+
                 return true;
             }
         }
-
-        return true;
+        else
+        {
+            return false;
+        }
     }
-
     public async Task<bool> ParseImagesAsync(string URL, ObservableCollection<MangaImagesData> ReaderInfo)
     {
         MangaImagesData data = new MangaImagesData();
@@ -381,36 +381,76 @@ public class Parser : IPlugin
 
         if (result.Length > 0 && result != null)
         {
-            Regex reg = new Regex("<p><img src=\"(.*?)\"></p>", RegexOptions.IgnoreCase);
-            MatchCollection matches = reg.Matches(result.ToString());
-            
-            if (matches.Count > 0 && Page < matches.Count)
+            Match match = Regex.Match(result.ToString(), "<a href=\"(?<NextPageLink>[^\"]+)\"><img src=\"(?<ImageLink>[^\"]+)\"");
+            if (match.Success)
             {
-                data.MaxPages = (uint)matches.Count;
-                data.ImageLink = matches[Page].Groups[1].Value;
-                data.PageLink = URL;
-                data.PageNumber = (uint)Page+1;
-                if (Page <= matches.Count)
-                {
-                    data.NextLink = URL;
-                }
-                else
-                {
-                    data.NextLink = "";
-                    Page = 0;
-                }
-                if (Page == 1)
-                {
-                    data.PrewLink = "";
-                }
-                else
-                {
-                    data.PrewLink = URL;
-                }
+                data.ImageLink = match.Groups["ImageLink"].Value;
             }
+            else
+            {
+                data.ImageLink = "";
+            }
+            match = Regex.Match(result.ToString(), "<div id=\"asset_2\">(.*?)</div>", RegexOptions.Multiline | RegexOptions.Singleline);
+            if (match.Success)
+            {
+                match = Regex.Match(match.Groups[1].Value, @"<option value=""(.*?)""(.*?)>(.*?)</option>", RegexOptions.Singleline);
+                Match nextMatch = null;
+                Match prevMatch = null;
+                while (match.Success)
+                {
+                    if (match.Groups[2].Value == @" selected=""selected""" | match.Groups[2].Value == @"selected=""selected""")
+                    {
+                        data.PageNumber = UInt32.Parse(match.Groups[3].Value);
+                        data.PageLink = Website + match.Groups[1].Value;
 
-            ReaderInfo.Add(data);
-            return true;
+                        nextMatch = match.NextMatch();
+                    }
+
+                    if (nextMatch == null)
+                    {
+                        prevMatch = match;
+                    }
+
+                    data.MaxPages = UInt32.Parse(match.Groups[3].Value);
+
+                    match = match.NextMatch();
+                    if (match.Index == 0)
+                    {
+                        break;
+                    }
+                }
+                if (nextMatch.Index != 0)
+                {
+                    data.NextLink = nextMatch.Groups[1].Value;
+                }
+                else
+                {
+                    data.NextLink = null;
+                }
+                if (prevMatch != null)
+                {
+                    if (prevMatch.Index != 0)
+                    {
+                        data.PrewLink = prevMatch.Groups[1].Value;
+                    }
+                    else
+                    {
+                        data.PrewLink = null;
+                    }
+                }
+                else
+                {
+                    data.PrewLink = null;
+                }
+
+                ReaderInfo.Add(data);
+                return true;
+            }
+        }
+        else
+        {
+            // data.ErrorMessage = "Nothing was found";
+            return false;
         }
         return false;
     }
@@ -562,10 +602,11 @@ namespace PluginTester
         {
             Parser parser = new Parser();
             //search test
-           /* ObservableCollection<MangaSearchData> result = new ObservableCollection<MangaSearchData>();
-                if(parser.ParseSearchAsync("nar", false, 0, result).Result == true)
+          /* ObservableCollection<MangaSearchData> result = new ObservableCollection<MangaSearchData>();
+                if(parser.ParseSearchAsync("Houseki", true, 1, result).Result == true)
                 {
-                    foreach(MangaSearchData item in result)
+                Console.WriteLine(result.Count);
+                foreach (MangaSearchData item in result)
                     {
                         Console.WriteLine("_____________________________");
                         Console.WriteLine("Manga Name: " + item.Name);
@@ -574,24 +615,28 @@ namespace PluginTester
                         Console.WriteLine("Next Page With Search Results: " + item.NextPage);
                         Console.WriteLine("Previous Page With Search Results: " + item.PrevPage);
                     }
-                }*/
-
-                //ObservableCollection<MangaPageChapters> resultCh = new ObservableCollection<MangaPageChapters>();
-                //ObservableCollection<MangaPageData> resultData = new ObservableCollection<MangaPageData>();
-                /*if (parser.ParseSelectedPageAsync("http://mymangaonline.net/manga-info/fairy-tail.html", false, resultData, resultCh).Result == true)
-                {
-                    Console.WriteLine("Manga Name: " + resultData.FirstOrDefault().Name);
-                    Console.WriteLine("Manga Alternate Name: " + resultData.FirstOrDefault().AlternateName);
-                    Console.WriteLine("Manga Author: " + resultData.FirstOrDefault().Author);
-                    Console.WriteLine("Manga Artist: " + resultData.FirstOrDefault().Artist);
-                    Console.WriteLine("Manga Genre: " + resultData.FirstOrDefault().Genre);
-                    Console.WriteLine("Manga Type: " + resultData.FirstOrDefault().Type);
-                    Console.WriteLine("Manga Status: " + resultData.FirstOrDefault().Status);
-                    Console.WriteLine("Manga Year of Release: " + resultData.FirstOrDefault().YearOfRelease);
-                    Console.WriteLine("Manga Website: " + resultData.FirstOrDefault().Website);
-                    Console.WriteLine("Manga Image: " + resultData.FirstOrDefault().Image);
-                    Console.WriteLine("Manga Description: " + resultData.FirstOrDefault().Description);
-                }*/
+                }
+                else
+            {
+                Console.WriteLine("shit");
+            }*/
+            
+                           ObservableCollection<MangaPageChapters> resultCh = new ObservableCollection<MangaPageChapters>();
+                           ObservableCollection<MangaPageData> resultData = new ObservableCollection<MangaPageData>();
+                           if (parser.ParseSelectedPageAsync("http://www.goodmanga.net/9404/houseki-no-kuni", false, resultData, resultCh).Result == true)
+                           {
+                               Console.WriteLine("Manga Name: " + resultData.FirstOrDefault().Name);
+                               Console.WriteLine("Manga Alternate Name: " + resultData.FirstOrDefault().AlternateName);
+                               Console.WriteLine("Manga Author: " + resultData.FirstOrDefault().Author);
+                               Console.WriteLine("Manga Artist: " + resultData.FirstOrDefault().Artist);
+                               Console.WriteLine("Manga Genre: " + resultData.FirstOrDefault().Genre);
+                               Console.WriteLine("Manga Type: " + resultData.FirstOrDefault().Type);
+                               Console.WriteLine("Manga Status: " + resultData.FirstOrDefault().Status);
+                               Console.WriteLine("Manga Year of Release: " + resultData.FirstOrDefault().YearOfRelease);
+                               Console.WriteLine("Manga Website: " + resultData.FirstOrDefault().Website);
+                               Console.WriteLine("Manga Image: " + resultData.FirstOrDefault().Image);
+                               Console.WriteLine("Manga Description: " + resultData.FirstOrDefault().Description);
+                           }
             /* if (parser.ParseSelectedPageAsync("http://mymangaonline.net/manga-info/fairy-tail.html", true, resultData, resultCh).Result == true)
              {
                  foreach(MangaPageChapters data in resultCh)
@@ -601,25 +646,25 @@ namespace PluginTester
                      Console.WriteLine("Chapter Website: " + data.UrlToPage);
                  }
              }*/
-            ObservableCollection<MangaImagesData> result = new ObservableCollection<MangaImagesData>();
-            string nextLink = "http://mymangaonline.net/read-online/Mujang-Ch-1.html";
-            while (nextLink != "")
-            {
-                if (parser.ParseImagesAsync(nextLink, result).Result == true)
-                {
-                    Console.WriteLine("Image: " + result.Last().ImageLink);
-                    Console.WriteLine("Page Link: " + result.Last().PageLink);
-                    Console.WriteLine("NextPage Link: " + result.Last().NextLink);
-                    Console.WriteLine("PrevPage Link: " + result.Last().PrewLink);
-                    Console.WriteLine("Page: " + result.Last().PageNumber + "/" + result.Last().MaxPages);
-                    if(parser.Page < result.Last().MaxPages)
-                        parser.Page += 1;
-                    else { break; }
+            /*        ObservableCollection<MangaImagesData> result = new ObservableCollection<MangaImagesData>();
+                    string nextLink = "http://mymangaonline.net/read-online/Mujang-Ch-1.html";
+                    while (nextLink != "")
+                    {
+                        if (parser.ParseImagesAsync(nextLink, result).Result == true)
+                        {
+                            Console.WriteLine("Image: " + result.Last().ImageLink);
+                            Console.WriteLine("Page Link: " + result.Last().PageLink);
+                            Console.WriteLine("NextPage Link: " + result.Last().NextLink);
+                            Console.WriteLine("PrevPage Link: " + result.Last().PrewLink);
+                            Console.WriteLine("Page: " + result.Last().PageNumber + "/" + result.Last().MaxPages);
+                            if(parser.Page < result.Last().MaxPages)
+                                parser.Page += 1;
+                            else { break; }
 
-                    nextLink = result.Last().NextLink;
-                    
-                }
-            }
+                            nextLink = result.Last().NextLink;
+
+                        }
+                    }*/
 
             Console.ReadKey();
         }

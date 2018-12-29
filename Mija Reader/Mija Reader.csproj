@@ -50,7 +50,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>main_icon.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DropNet, Version=1.10.23.0, Culture=neutral, processorArchitecture=MSIL">
@@ -181,9 +182,6 @@
       <Project>{dbd92dc4-4a74-4cdf-8048-6e3c783af4b7}</Project>
       <Name>BaseMangaSource</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="main_icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="tweet.ico" />
